@@ -8,7 +8,7 @@ Sistema completo: mapa web (escritorio + móvil), app de relevamiento para Andro
 |---|---|---|
 | `escritorio/` | Mapa interactivo completo (PC) | `…/escritorio/` |
 | `movil/` | App móvil de campo: GPS, fichas con fotos, simulador, circuitos | `…/movil/` |
-| `relevador/` | App de relevamiento (GPS + foto + exportación). Diseñada para envolverse en WebView (Sketchware) — ver `moderacion/guia-sketchware.md` | `…/relevador/` |
+| `relevador/` | App de relevamiento (GPS + foto + **envío directo al servidor** + exportación offline). Diseñada para WebView (Sketchware) — ver `moderacion/guia-sketchware.md` | `…/relevador/` |
 | `moderacion/` | Scripts de Google Apps Script + guías del sistema de aportes con moderación | (no se publican, es documentación) |
 | `index.html` | Raíz: redirige automático a móvil o escritorio según el dispositivo | `…/` |
 
@@ -24,7 +24,7 @@ Cada commit redespliega el sitio automáticamente.
 
 Instalación completa (15 min, una vez): seguir `moderacion/README-camino-B.md`.
 
-Flujo: **relevador** envía desde el formulario de Google (con su cuenta = contraseña) → queda **PENDIENTE** → los **moderadores** reciben un email y lo aprueban/rechazan desde el panel (PIN) → lo aprobado aparece **solo** en los mapas.
+Flujo: la **app relevador** envía directo con su botón 🚀 (o por el formulario de Google) → queda **PENDIENTE** → los **moderadores** reciben un email y lo aprueban/rechazan desde el panel (PIN) → lo aprobado aparece **solo** en los mapas.
 
 Para conectar los mapas con el servidor de Google, editar la línea `window.FUENTE_COMUNITARIA = "";`:
 - en `movil/index.html` (integración completa: mapa, listas, buscador, fichas, caché offline)

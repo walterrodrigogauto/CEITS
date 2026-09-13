@@ -35,6 +35,8 @@ Cómo funciona **hoy** el sistema, pieza por pieza, desde que alguien releva un 
 
 ---
 
+> **⭐ Novedad:** la app relevador ahora **envía directo al servidor** (botón 🚀 en la pestaña Exportar). El formulario de Google queda como segunda vía y el lote .json como plan C sin señal. Detalle en la sección 3.
+
 ## 1 · Las piezas y dónde viven
 
 | Pieza | Dónde vive | Quién la usa |
@@ -67,21 +69,23 @@ Cómo funciona **hoy** el sistema, pieza por pieza, desde que alguien releva un 
 
 ---
 
-## 3 · Paso 2: el envío (dos rutas según la señal)
+## 3 · Paso 2: el envío (tres rutas)
 
-### Ruta principal · con señal → formulario de Google
-El relevador completa el **formulario de Google** (link que reparte el coordinador). Campos: Especie*, "Otra especie, ¿cuál?", ¿Es tintórea?*, Coordenadas lat*/lng*, Parque/sitio*, Referencia/dirección, Cantidad, Tipo, Edad estimada, Notas/curiosidad, **Foto**.
+### Ruta principal · botón 🚀 de la app (con señal)
+En la pestaña **Exportar** de la app relevador: se escribe el **nombre o email** (la "firma" de cada registro, se guarda en el teléfono) y se toca **"🚀 Enviar registros nuevos al moderador"**.
 
-- El formulario **exige iniciar sesión con Google**: ese login es la "firma" — dice quién relevó. No hay contraseñas que repartir ni que se filtren.
-- La foto se sube al **Drive** del coordinador automáticamente.
-- Puede enviar de a un registro por vez, justo cuando lo releva.
+- La app manda cada registro (datos + **foto embebida**) por POST al servidor, con la clave de envío (`flora2026`, la misma del candado).
+- El servidor valida la clave, guarda la **foto en Drive**, crea la fila con `estado = pendiente` y avisa por email. Es idempotente: reenviar no duplica.
+- Cada registro queda marcado en la app: 🚀 *enviado (verificando)* → ✅ *en el servidor* (la app confirma sola contra `accion=verificar`).
+- Si no había señal en el momento de tocar el botón, los registros quedan en el teléfono y se envían después.
 
-### Ruta alternativa · sin señal → lote .json
-Si relevó sin datos (zona sin cobertura), desde **Registros → Exportar lote .json**: baja un archivo `flora-campo_lote_FECHA.json` con **todos los registros pendientes y las fotos embebidas adentro**, cada uno marcado `_estado: "pendiente"`.
+### Ruta 2 · formulario de Google (segunda vía)
+El formulario sigue funcionando intacto (con login de Google como firma y subida de foto al Drive — vía link en cuentas personales). Útil para quien prefiera el formulario o reporte desde la PC.
 
-- Se manda al moderador como **archivo adjunto** (WhatsApp en modo *Documento*, email, o link de Drive).
-- ⚠️ **Hoy no existe importación automática de ese lote**: el moderador lo incorpora cargando los registros por el formulario (una vez que recupera señal). Es la ruta para casos puntuales, no el camino de todos los días.
-- El botón CSV es solo para planillas: **no incluye fotos**.
+### Ruta 3 · lote .json (plan C, sin señal)
+Si se relevó sin datos y hace falta sacar todo del teléfono por WhatsApp/email: **Exportar lote .json** (con fotos embebidas). Hoy se incorpora cargándolo por el formulario o la app. El .csv no incluye fotos.
+
+Las tres rutas convergen en la misma hoja **Ejemplares** con `estado = pendiente`: mismo panel, misma moderación, mismo mapa.
 
 ---
 
@@ -156,6 +160,7 @@ Con la URL pegada (y un commit para publicarla), cada vez que alguien abre el ma
 | Credencial | Valor actual | Dónde vive | Quién la usa |
 |---|---|---|---|
 | Candado del relevador | `flora2026` | Dentro de `relevador/index.html` (hash) | Relevadores |
+| Clave de envío de la app | `flora2026` (misma que el candado) | `relevador/index.html` + `02_servidor_datos.gs` | Viaja automática en cada POST |
 | Login del formulario | Cuenta de Google de cada uno | Google | Relevadores (es su firma) |
 | PIN de moderación | `flora-mod-2026` | **Solo en Apps Script** (en tu Google, no en el repo) | Moderadores |
 | Lista MODERADORES | emails | **Solo en Apps Script** | — |
