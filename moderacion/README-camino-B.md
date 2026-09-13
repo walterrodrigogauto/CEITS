@@ -88,3 +88,21 @@ Pegá tu URL entre las comillas y guardá. **Eso es todo**: la app móvil ahora,
 ## ¿Y la página de escritorio?
 
 Los mismos datos aprobados pueden cargarse allí también; por ahora la integración automática vive en la **app móvil** (la herramienta de terreno). Cuando quieras, regenero la de escritorio con el mismo cargador.
+
+
+---
+
+## ⭐ Novedad: la app relevador ahora envía directa
+
+La app tiene el botón **"🚀 Enviar registros nuevos al moderador"** (pestaña Exportar): manda datos + foto por POST a la URL `/exec` (ya viene horneada), con clave `flora2026`. No hace falta tocar el formulario: el envío entra **pendiente** como cualquier otro y se modera igual. El formulario queda como segunda vía; el .json como plan sin señal. Para activarlo basta con la implementación de este mismo servidor actualizada (incluye `doPost` y `accion=verificar`).
+
+
+---
+
+## 🗑️ Bajas de ejemplares (incluida la base central) · pestaña "Publicados"
+
+1. **Una sola vez**: abrir la hoja de Google → Archivo → Importar → subir `base-para-importar.csv` → **"Insertar hoja nueva"** → renombrarla exactamente **`Base`**. (Es la copia editable de los 93 ejemplares de la base central.)
+2. Desde el panel: pestaña **🌍 Publicados** → botón **🗑️ Dar de baja** en el ejemplar que ya no existe. Desaparece de los mapas en la próxima recarga (el servidor lo publica en `_bajas` y los mapas lo ocultan solos).
+3. Reactivar: hoja "Base" → poner `estado = aprobado` en esa fila.
+
+El rechazo de pendientes también mejoró: motivo integrado en la tarjeta (sin ventanas emergentes, que el entorno de Google bloquea) y la tarjeta desaparece al instante al confirmar.
