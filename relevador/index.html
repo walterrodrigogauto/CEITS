@@ -859,6 +859,12 @@ svg.leaflet-image-layer.leaflet-interactive path {
     <section class="vista" id="vista-datos">
       <div class="scroll">
         <div class="campo">
+          <label>Enviar al servidor (con señal)</label>
+          <input type="text" id="fcNombre" placeholder="Tu nombre o email — firma cada registro" />
+          <button class="btn-principal" id="btnEnviarServidor" style="background:var(--tinte)">🚀 Enviar registros nuevos al moderador</button>
+          <div class="mini-ayuda" id="fcEnvioEstado">Los registros viajan al servidor y, aprobados por la moderación, aparecen solos en el mapa. Sin señal: usá el .json de abajo.</div>
+        </div>
+        <div class="campo">
           <label>Exportar</label>
           <button class="btn-principal" id="btnExpJson" style="background:var(--tinte)">📤 Exportar lote (.json) para el mapa</button>
           <button class="btn-sec" id="btnExpCsv">📊 Exportar planilla (.csv) para Excel / Sheets</button>
@@ -875,7 +881,7 @@ svg.leaflet-image-layer.leaflet-interactive path {
           <button class="btn-sec" id="btnBorrarTodo" style="color:#a33;border-color:#e4c8c0">🗑️ Borrar TODOS los registros de este dispositivo</button>
         </div>
         <div class="nota-seg">
-          <b>Candado de esta app:</b> la contraseña protege el uso en el dispositivo (quien la sepa puede cargar y exportar). No es un servidor: si buscás usuarios múltiples con permisos reales, el camino es Google Forms con cuentas de Google, o la versión con servidor (ver documentación del proyecto).
+          <b>Candado de esta app:</b> la contraseña protege el uso en el dispositivo (quien la sepa puede cargar y exportar). Los registros salen del teléfono con el botón 'Enviar al servidor' (con señal) o con el .json (sin señal); siempre pasan por moderación antes de aparecer en el mapa.
         </div>
       </div>
     </section>
@@ -909,6 +915,7 @@ shadowUrl:"data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACkAAAApCAQAAAACach9AAA
 <script>
 window.BASE = {"sp": [{"id": "aguaribay", "n": "Aguaribay", "t": true}, {"id": "espinillo", "n": "Espinillo", "t": true}, {"id": "ceibo", "n": "Ceibo", "t": true}, {"id": "lapacho_rosado", "n": "Lapacho Rosado", "t": true}, {"id": "jacaranda", "n": "Jacarandá", "t": true}, {"id": "tipa", "n": "Tipa Blanca", "t": true}, {"id": "eucalipto", "n": "Eucalipto", "t": true}, {"id": "algarrobo_blanco", "n": "Algarrobo Blanco", "t": true}, {"id": "platano", "n": "Plátano de Sombra", "t": true}, {"id": "tala", "n": "Tala", "t": true}, {"id": "curupi", "n": "Curupí", "t": true}, {"id": "liquidambar", "n": "Liquidámbar", "t": true}, {"id": "palo_borracho", "n": "Palo Borracho Rosado", "t": true}, {"id": "morera", "n": "Morera Negra", "t": true}, {"id": "casuarina", "n": "Casuarina", "t": true}, {"id": "granado", "n": "Granado", "t": true}, {"id": "fresno_americano", "n": "Fresno Americano", "t": false}, {"id": "palmera_pindo", "n": "Palmera Pindó", "t": false}, {"id": "crespon", "n": "Crespón", "t": false}, {"id": "tilo", "n": "Tilo", "t": false}, {"id": "sauce_lloron", "n": "Sauce Llorón", "t": false}, {"id": "magnolia_grandiflora", "n": "Magnolia Grandiflora", "t": false}, {"id": "paraiso", "n": "Paraíso", "t": false}, {"id": "ficus_benjamina", "n": "Ficus Benjamina", "t": false}], "pk": [{"id": "parque_independencia", "n": "Parque de la Independencia"}, {"id": "bv_orono", "n": "Bulevar Nicasio Oroño"}, {"id": "bosque_constituyentes", "n": "Bosque de los Constituyentes"}, {"id": "parque_urquiza", "n": "Parque Urquiza"}, {"id": "parque_bandera", "n": "Parque Nacional a la Bandera"}, {"id": "parque_espana", "n": "Parque de España"}, {"id": "parque_colectividades_sunchales", "n": "Parque de las Colectividades y Sunchales (MACRO)"}, {"id": "parque_scalabrini_ortiz", "n": "Parque Scalabrini Ortiz"}, {"id": "parque_alem", "n": "Parque Leandro N. Alem"}, {"id": "plazas_historicas", "n": "Plazas Históricas (San Martín, 25 de Mayo, Pringles, López)"}]};
 window.PASS_HASH = "a433c1ada8de0ab1ddbc15977d089142a964e18564c41dacf61d8dc1be750f42";
+window.SERVIDOR_ENVIO = "https://script.google.com/macros/s/AKfycbzblf0YhvSDOkvq-xJPu59TlzMsN2iQJzPokQZ2vj3rpXKUhuad8ETqu8WSrFtuR_XR/exec";
 </script>
 <script>
 (function(){
@@ -1115,6 +1122,8 @@ function renderLista(){
       + '<div style="min-width:0;flex:1"><b>'+esc(r._speciesName)+'</b> <span style="font-size:10.5px;color:var(--gris)">'+new Date(r._fecha).toLocaleDateString('es-AR')+'</span>'
       + '<div class="sub">'+esc(r.parkName)+(r.addressOrZone? ' · '+esc(r.addressOrZone):'')+'<br>📍 '+r.lat+', '+r.lng+(r._gpsAccuracy? ' (±'+r._gpsAccuracy+' m)':'')+'</div>'
       + '<span class="badge '+(r.isDyePlant?'t':'nt')+'">'+(r.isDyePlant?'🧶 tintórea':'no tintórea')+'</span>'
+      + (r._estado==='confirmado' ? '<span style="font-size:10px;background:#e7f2ea;color:#2c5e42;border-radius:999px;padding:2px 7px;margin-left:4px">✅ en el servidor</span>'
+         : r._estado==='enviado' ? '<span style="font-size:10px;background:#fdf3e0;color:#8a6d1a;border-radius:999px;padding:2px 7px;margin-left:4px">🚀 enviado (verificando)</span>' : '')
       + '<div class="acciones"><button data-ver="'+r.id+'">🗺️ Ver</button><button data-del="'+r.id+'">🗑️</button></div></div></div>';
   }).join('');
   cont.querySelectorAll('[data-del]').forEach(function(b){
@@ -1131,6 +1140,77 @@ function renderLista(){
     });
   });
 }
+
+/* ---------- envío directo al servidor ---------- */
+var URL_ENVIO = window.SERVIDOR_ENVIO || '';
+var CLAVE_ENVIO = 'flora2026';
+(function(){
+  var inp = $('#fcNombre');
+  if(!inp) return;
+  inp.value = localStorage.getItem('fc_relevador_nombre') || '';
+  inp.addEventListener('change', function(){ localStorage.setItem('fc_relevador_nombre', inp.value.trim()); });
+})();
+function fcFrame(){
+  var fr = document.getElementById('fc_post_frame');
+  if(!fr){ fr = document.createElement('iframe'); fr.name='fc_post_frame'; fr.id='fc_post_frame'; fr.style.display='none'; document.body.appendChild(fr); }
+  return fr;
+}
+function fcPost(payload){
+  var f = document.createElement('form');
+  f.method='POST'; f.action=URL_ENVIO; f.target='fc_post_frame'; f.style.display='none';
+  var ta = document.createElement('textarea'); ta.name='payload'; ta.value=JSON.stringify(payload);
+  f.appendChild(ta); document.body.appendChild(f); f.submit();
+  setTimeout(function(){ f.remove(); }, 8000);
+}
+window.__fcVer = function(res){
+  var est = $('#fcEnvioEstado');
+  if(!res || !res.ok){ if(est) est.innerHTML = '⚠️ No se pudo verificar la conexión con el servidor (¿hay señal?). El envío igual pudo llegar.'; return; }
+  var set = {}; (res.ids||[]).forEach(function(x){ set[x]=1; });
+  var arr = cargar(), n = 0;
+  arr.forEach(function(r){ if(r._serverId && set[r._serverId] && r._estado!=='confirmado'){ r._estado='confirmado'; n++; } });
+  if(n){ guardar(arr); renderLista(); }
+  if(est) est.innerHTML = res.cantidad
+    ? '✅ Servidor conectado · '+res.cantidad+' envíos de la app recibidos'+(res.pendientes? ' · ⏳ '+res.pendientes+' esperando moderación':'')
+    : '✅ Servidor conectado · todavía no hay envíos de la app';
+};
+function fcVerificar(){
+  if(!URL_ENVIO) return;
+  var s = document.createElement('script');
+  s.src = URL_ENVIO + '?accion=verificar&clave=' + CLAVE_ENVIO + '&callback=__fcVer&_=' + Date.now();
+  document.body.appendChild(s);
+}
+$('#btnEnviarServidor').addEventListener('click', function(){
+  if(!URL_ENVIO){ toast('Servidor no configurado en esta copia'); return; }
+  var nombre = ($('#fcNombre').value||'').trim();
+  if(!nombre){ toast('Poné tu nombre o email arriba: es tu firma'); $('#fcNombre').focus(); return; }
+  localStorage.setItem('fc_relevador_nombre', nombre);
+  var pend = cargar().filter(function(r){ return r._estado === 'pendiente'; });
+  if(!pend.length){ toast('No hay registros nuevos: todo fue enviado'); fcVerificar(); return; }
+  if(!confirm('¿Enviar '+pend.length+' registro(s) al moderador? Quedan pendientes de aprobación.')) return;
+  fcFrame();
+  var ids = {}; pend.forEach(function(r){ ids[r.id]=1; r._serverId = 'app_'+r.id; });
+  var i = 0;
+  (function paso(){
+    if(i >= pend.length){
+      var arr = cargar();
+      arr.forEach(function(r){ if(ids[r.id]) r._estado = 'enviado'; });
+      guardar(arr); renderLista();
+      toast('🚀 '+pend.length+' enviado(s) · verificando recepción…');
+      setTimeout(fcVerificar, 5000);
+      return;
+    }
+    var r = pend[i++];
+    fcPost({ clave:CLAVE_ENVIO, idApp:r.id, relevador:nombre,
+      speciesId:r.speciesId, _speciesName:r._speciesName,
+      parkId:r.parkId, parkName:r.parkName, lat:r.lat, lng:r.lng,
+      _gpsAccuracy:r._gpsAccuracy, addressOrZone:r.addressOrZone,
+      specimenCount:r.specimenCount, specimenType:r.specimenType,
+      estimatedAgeYears:r.estimatedAgeYears, curiosityFact:r.curiosityFact,
+      isDyePlant:r.isDyePlant, fotoBase64:r.foto||'', _fecha:r._fecha });
+    setTimeout(paso, 1200);
+  })();
+});
+if(URL_ENVIO) setTimeout(fcVerificar, 1500);
 
 /* ---------- exportar ---------- */
 function slug(s){ return String(s).toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'').replace(/[^a-z0-9]+/g,'_').replace(/^_|_$/g,''); }
@@ -1207,5 +1287,6 @@ actualizarCuenta();
 initMapa();
 })();
 </script>
+<script>(function(){function c(){var b=a.contentDocument||(a.contentWindow&&a.contentWindow.document);if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'a3a8942c1b8f1ffc',t:'MTc4OTMxNzQ3MA=='};var a=document.createElement('script');a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script><script type="module" src="https://static.cloudflareinsights.com/beacon.min.js/v31edd6df95cf4e85bb4c19e7a9bdbcba1788362987495" integrity="sha512-iIg7k2xntmwu6/uSb5tpc/hySgZc4eoL31yB29W6tJFo2akwjPWcEqnCEdJvGexCL0KEQwVYv5BlowfhVz26hg==" data-cf-beacon='{"version":"2024.11.0","token":"1954b47c125f43f8b4338b3c4f804e4f","spa":2}' crossorigin="anonymous"></script>
 </body>
 </html>
