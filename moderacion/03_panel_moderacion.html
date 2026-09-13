@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<base target="_top">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Flora Rosario · Moderación</title>
+<style>
+  :root{--marron:#3d2b1e;--verde:#2c5e42;--tinte:#b35434;--crema:#faf5ec;--papel:#fffdf8;--linea:#e6ddcc;--gris:#7a6f61;}
+  *{box-sizing:border-box}
+  body{margin:0;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Arial,sans-serif;background:var(--crema);color:#2a2118}
+  header{background:var(--marron);color:#f4ecdd;padding:14px 18px;display:flex;align-items:center;gap:10px}
+  header h1{font-size:16px;margin:0;flex:1}
+  main{max-width:680px;margin:0 auto;padding:14px}
+  .login{max-width:360px;margin:60px auto;text-align:center;background:var(--papel);border:1px solid var(--linea);border-radius:16px;padding:28px}
+  .login input{padding:12px;border:1.5px solid var(--linea);border-radius:10px;font-size:15px;width:100%;text-align:center}
+  .login button{margin-top:10px;padding:12px 22px;border-radius:10px;border:none;background:var(--tinte);color:#fff;font-weight:700;font-size:15px;cursor:pointer}
+  .pend{background:var(--papel);border:1px solid var(--linea);border-radius:14px;padding:12px;margin-bottom:12px}
+  .pend img.f{width:100%;max-height:230px;object-fit:cover;border-radius:10px;margin-bottom:8px}
+  .pend h3{margin:0;font-size:15px}
+  .pend .sub{font-size:12px;color:var(--gris);margin:3px 0}
+  .badge{display:inline-block;font-size:10.5px;font-weight:800;border-radius:999px;padding:2px 9px;margin:3px 4px 3px 0}
+  .b-t{background:#f7e8df;color:#8a4326}
+  .b-nt{background:#eee9dd;color:#6c6558}
+  .b-acc{background:#e4f0e0;color:#2c5e42}
+  .acciones{display:flex;gap:8px;margin-top:9px}
+  .btn{flex:1;padding:11px;border-radius:10px;border:none;font-weight:800;font-size:13.5px;cursor:pointer}
+  .ok{background:var(--verde);color:#fff}
+  .no{background:#fff;border:1.5px solid #d8c9c2;color:#a33}
+  .vacio{text-align:center;color:var(--gris);padding:50px 20px;line-height:1.6}
+  .estado-bar{background:#efe9db;font-size:11.5px;color:#6b6152;border-radius:9px;padding:7px 10px;margin-bottom:12px}
+  #toast{position:fixed;left:50%;bottom:24px;transform:translateX(-50%);background:var(--marron);color:#fff;padding:10px 18px;border-radius:999px;font-size:13px;display:none}
+</style>
+</head>
+<body>
+<header>
+  <div style="font-size:22px">🛡️</div>
+  <h1>Flora Rosario · Moderación</h1>
+</header>
+<main>
+  <div id="login" class="login">
+    <div style="font-size:38px">🔒</div>
+    <p style="font-size:13px;color:var(--gris);line-height:1.5">Panel de aprobación de relevamientos.<br>Ingresá el PIN de moderación.</p>
+    <input type="password" id="pin" placeholder="PIN de moderador" />
+    <button onclick="entrar()">Entrar</button>
+    <p id="err" style="color:#a33;font-size:12px;min-height:16px"></p>
+  </div>
+  <div id="contenido" style="display:none">
+    <div class="estado-bar" id="barra">Cargando…</div>
+    <div id="lista"></div>
+  </div>
+</main>
+<div id="toast"></div>
+
+<script>
+var PIN = sessionStorage.getItem('fr_pin') || '';
+function $(s){return document.querySelector(s);}
+function toast(t){var e=$('#toast');e.textContent=t;e.style.display='block';clearTimeout(e._t);e._t=setTimeout(function(){e.style.display='none';},2600);}
+
+function entrar(){
+  PIN = $('#pin').value;
+  google.script.run.withSuccessHandler(function(ok){
+    if(ok){ sessionStorage.setItem('fr_pin', PIN); $('#login').style.display='none'; $('#contenido').style.display='block'; cargar(); }
+    else { $('#err').textContent='PIN incorrecto'; }
+  }).withFailureHandler(function(e){ $('#err').textContent='Error: '+e; }).validarPin(PIN);
+}
+$('#pin').addEventListener('keydown', function(e){ if(e.key==='Enter') entrar(); });
+
+function cargar(){
+  $('#barra').textContent = 'Cargando pendientes…';
+  google.script.run.withSuccessHandler(render).withFailureHandler(function(e){
+    $('#barra').textContent = 'Error al cargar: '+e;
+  }).pendientes();
+}
+
+function render(pends){
+  var d = new Date();
+  $('#barra').textContent = pends.length + ' envío(s) pendiente(s) · ' + d.toLocaleString('es-AR');
+  if(!pends.length){ $('#lista').innerHTML = '<div class="vacio">✅ No hay nada pendiente.<br>Cuando alguien envíe un relevamiento desde el formulario, va a aparecer acá para aprobar.</div>'; return; }
+  $('#lista').innerHTML = pends.map(function(r){
+    var tin = (r.isDyePlant === true || r.isDyePlant === 'sí') ? '<span class="badge b-t">🧶 tintórea</span>'
+            : (r.isDyePlant === false || r.isDyePlant === 'no') ? '<span class="badge b-nt">no tintórea</span>'
+            : '<span class="badge b-nt">tintórea: sin definir ⚠️</span>';
+    return '<div class="pend" id="p_'+r.id+'">'
+      + (r.foto ? '<img class="f" src="'+r.foto+'" alt="foto del ejemplar">' : '')
+      + '<h3>'+esc(r._speciesName)+'</h3>'
+      + '<div class="sub">'+esc(r.parkName)+(r.addressOrZone? ' · '+esc(r.addressOrZone):'')+'</div>'
+      + '<div class="sub">📍 <a href="https://www.openstreetmap.org/?mlat='+r.lat+'&mlon='+r.lng+'#map=18/'+r.lat+'/'+r.lng+'" target="_blank">'+r.lat+', '+r.lng+'</a>'
+      + ' · por '+esc(r.relevador||'—')+' · '+new Date(r._fecha).toLocaleString('es-AR')+'</div>'
+      + tin + (r.specimenCount? '<span class="badge b-acc">✖ '+r.specimenCount+'</span>':'')
+      + (r.curiosityFact? '<div class="sub" style="margin-top:6px">💬 '+esc(r.curiosityFact)+'</div>':'')
+      + '<div class="acciones">'
+      + '<button class="btn ok" onclick="moderar(\''+r.id+'\',\'aprobado\')">✅ Aprobar</button>'
+      + '<button class="btn no" onclick="rechazar(\''+r.id+'\')">🗑️ Rechazar</button>'
+      + '</div></div>';
+  }).join('');
+}
+
+function moderar(id, estado){
+  var motivo = '';
+  if(estado==='rechazado'){ motivo = prompt('Motivo del rechazo (opcional):') || ''; if(motivo===null) motivo=''; }
+  google.script.run.withSuccessHandler(function(){
+    toast(estado==='aprobado'? '✅ Aprobado: ya visible en el mapa' : '🗑️ Rechazado');
+    var el = document.getElementById('p_'+id);
+    if(el){ el.style.opacity='.4'; el.querySelector('.acciones').remove(); }
+    setTimeout(cargar, 900);
+  }).withFailureHandler(function(e){ toast('Error: '+e); }).moderarDesdePanel(id, estado, PIN, motivo);
+}
+
+function esc(s){ return String(s==null?'':s).replace(/[&<>"]/g,function(c){return{'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c];}); }
+
+if(PIN){ $('#pin').value = PIN; entrar(); }
+</script>
+</body>
+</html>
