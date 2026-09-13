@@ -515,10 +515,8 @@ window.__volar = function(lat,lng,z){ cerrarSheet(); navs.forEach(function(x){x.
 function chipsEspecie(sp){
   var d = sp.dyeInfo||{};
   var out = '';
-  if(sp.category==='comunitario') out += '<span class="tag">🌱 Registro comunitario</span>';
   if(d.isDyePlant) out += '<span class="tag tinte">🧶 Tintórea · '+esc(d.dyeYieldLevel||'')+'</span>';
-  if(/Nativa/.test(sp.origin)) out += '<span class="tag nat">🌱 '+esc(sp.origin)+'</span>';
-  else out += '<span class="tag">🌍 '+esc(sp.origin)+'</span>';
+  if(sp.origin){ if(/Nativa/.test(sp.origin)) out += '<span class="tag nat">🌱 '+esc(sp.origin)+'</span>'; else out += '<span class="tag">🌍 '+esc(sp.origin)+'</span>'; }
   return out;
 }
 
@@ -608,7 +606,6 @@ function sheetArbol(id){
     + '<div class="sheet-titulo">'+(sp?esc(sp.commonName):esc(t.speciesId))+'</div>'
     + '<div class="sheet-sub"><i>'+(sp?esc(sp.scientificName):'')+'</i></div>'
     + '<div class="meta-chips">'
-    + (t._comunitario? '<span class="mchip" style="background:#e4f0e0;color:#2c5e42">🌱 Aporte comunitario'+(t._relevador? ' · '+esc(t._relevador):'')+'</span>':'')
     + '<span class="mchip">📍 '+esc(t.parkName)+'</span>'
     + (t.specimenCount? '<span class="mchip">✖ '+esc(t.specimenCount)+' ejemplar(es)</span>':'')
     + (t.specimenType? '<span class="mchip">🌿 '+esc(t.specimenType)+'</span>':'')
@@ -850,14 +847,13 @@ var comCargados = 0;
 function especieComunitaria(id, nombre, esTinte){
   /* id = speciesId EXACTO que trae el registro del servidor (p.ej. 'paraiso', 'otro', 'otra_cebolla') */
   if(!ESPECIES[id]){
-    ESPECIES[id] = { id:id, commonName:nombre, otherCommonNames:[], scientificName:'(registro comunitario)',
-      family:'—', origin:'Registro comunitario', category:'comunitario', badgeEmoji:'🌳',
+    ESPECIES[id] = { id:id, commonName:nombre, otherCommonNames:[], scientificName:'',
+      family:'—', origin:'', category:'comunitario', badgeEmoji:'🌳',
       floweringSeason:'—', foliageType:'—',
-      description:'Especie relevada por la comunidad. Ficha completa en construcción.',
-      ecologicalRole:'', rosarioPresenceDescription:'', tags:['Registro comunitario'],
+      description:'Especie registrada por el equipo de relevamiento de flora urbana de Rosario.',
+      ecologicalRole:'', rosarioPresenceDescription:'', tags:[],
       dyeInfo:{ isDyePlant:!!esTinte, dyeYieldLevel:'—', usedParts:[], pigmentCompounds:[],
-        primaryColorCategory:null,
-        colorPalette:[{name:'Color comunitario', hex:'#8a8073', mordant:'', notes:''}],
+        primaryColorCategory:null, colorPalette:[],
         mordantsRecommended:[], fabricSuitability:[], colorFastness:'—',
         extractionMethod:'', foragingEthicNote:'', culturalContext:'' } };
   }
@@ -869,9 +865,16 @@ function integrarComunitarios(arr){
     if(t.lat < -33.05 || t.lat > -32.80 || t.lng < -60.85 || t.lng > -60.40) return;
     for(var i=0;i<ARBOLES.length;i++){ if(ARBOLES[i].id===t.id) return; }
     if(!ESPECIES[t.speciesId]) especieComunitaria(t.speciesId, t._speciesName || t.speciesId, t.isDyePlant);
-    t._comunitario = true;
     ARBOLES.push(t); comCargados++;
   });
+}
+function aplicarBajas(arr){
+  /* quita del mapa/listas los ejemplares de la base dados de baja (hoja "Base") */
+  if(!arr || !arr.length) return 0;
+  var set = {}; arr.forEach(function(b){ if(b && b.id) set[b.id]=1; });
+  var n = 0;
+  for(var i=ARBOLES.length-1;i>=0;i--){ if(set[ARBOLES[i].id]){ ARBOLES.splice(i,1); n++; } }
+  return n;
 }
 function pintarComEstado(txt){
   var e = $('#comEstado');
@@ -885,9 +888,11 @@ function cargarComunitarios(){
   if(!url){ pintarComEstado('Aportes comunitarios: sin fuente configurada todavía. Los relevamientos aprobados se incorporan regenerando el archivo o configurando la URL del servidor (ver README Camino B).'); return; }
   var aplicar = function(lote, via){
     if(!lote || !lote.ejemplares){ pintarComEstado('Aportes comunitarios: respuesta no válida del servidor.'); return; }
+    var quitadas = aplicarBajas(lote._bajas||[]);
     integrarComunitarios(lote.ejemplares);
-    try{ localStorage.setItem('flora_com_cache', JSON.stringify({ts:lote._actualizado||new Date().toISOString(), ej:lote.ejemplares})); }catch(e){}
-    if(comCargados){ recargarVistasCom(); toast('🌱 '+comCargados+' aportes comunitarios cargados'); }
+    try{ localStorage.setItem('flora_com_cache', JSON.stringify({ts:lote._actualizado||new Date().toISOString(), ej:lote.ejemplares, bajas:lote._bajas||[]})); }catch(e){}
+    if(comCargados || quitadas){ recargarVistasCom(); }
+    if(comCargados){ toast('✅ '+comCargados+' registro(s) actualizado(s) desde el servidor'); }
     pintarComEstado('Aportes comunitarios activos: <b>'+lote._cantidad+'</b> aprobados en línea'
       + (comCargados? ' · '+comCargados+' integrados ahora':'')
       + ' · última actualización ' + new Date(lote._actualizado||Date.now()).toLocaleString('es-AR')
@@ -898,6 +903,7 @@ function cargarComunitarios(){
     try{
       var c = JSON.parse(localStorage.getItem('flora_com_cache')||'null');
       if(c && c.ej && c.ej.length){
+        aplicarBajas(c.bajas||[]);
         integrarComunitarios(c.ej);
         if(comCargados) recargarVistasCom();
         pintarComEstado('Aportes comunitarios desde <b>caché</b> ('+motivo+'): '+c.ej.length+' registros · guardados '+new Date(c.ts).toLocaleString('es-AR'));
@@ -930,6 +936,5 @@ initMapa();
 cargarComunitarios();
 })();
 </script>
-<script>(function(){function c(){var b=a.contentDocument||(a.contentWindow&&a.contentWindow.document);if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'a3a811816ee34e64',t:'MTc4OTMxMjExNw=='};var a=document.createElement('script');a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script><script type="module" src="https://static.cloudflareinsights.com/beacon.min.js/v31edd6df95cf4e85bb4c19e7a9bdbcba1788362987495" integrity="sha512-iIg7k2xntmwu6/uSb5tpc/hySgZc4eoL31yB29W6tJFo2akwjPWcEqnCEdJvGexCL0KEQwVYv5BlowfhVz26hg==" data-cf-beacon='{"version":"2024.11.0","token":"1954b47c125f43f8b4338b3c4f804e4f","spa":2}' crossorigin="anonymous"></script>
 </body>
 </html>
