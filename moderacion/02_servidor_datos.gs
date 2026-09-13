@@ -25,6 +25,12 @@ const ID_HOJA = 'PEGAR_AQUI_EL_ID_DE_LA_HOJA';   // el que devolvió el paso 1
 const MODERADORES = ['tu-email@gmail.com'];       // emails con poder de aprobación
 const PIN_MODERADOR = 'flora-mod-2026';           // contraseña del panel
 
+// ✏️ URL FIJA de la app web (la misma que consume el mapa). Se usa en los emails a
+// moderadores, porque getService().getUrl() puede devolver URLs de implementaciones
+// viejas cuando el mail lo manda el trigger. Si algún día cambia la URL, editá esta línea.
+const URL_SERVICIO = 'https://script.google.com/macros/s/AKfycbzblf0YhvSDOkvq-xJPu59TlzMsN2iQJzPokQZ2vj3rpXKUhuad8ETqu8WSrFtuR_XR/exec';
+const CLAVE_ENVIO = 'flora2026';                  // clave que trae la app relevador para ENVIAR (misma que su candado)
+
 const HOJA_EJ = 'Ejemplares';
 const HOJA_CFG = 'Config';
 
@@ -38,6 +44,7 @@ function doGet(e) {
     if (accion === 'panel') return HtmlService.createHtmlOutputFromFile('03_panel_moderacion')
       .setTitle('Flora Rosario · Moderación').addMetaTag('viewport', 'width=device-width, initial-scale=1');
     if (accion === 'moderar') return json(moderarPorUrl(p.id, p.estado, p.pin, p.motivo));
+    if (accion === 'verificar') return json(verificarEnviosApp(p), p.callback);
     return json({ error: 'accion desconocida' });
   } catch (err) {
     return json({ error: String(err) });
@@ -81,6 +88,76 @@ function leerAprobados() {
     _pendientes: contar('pendiente'),
     ejemplares: out
   };
+}
+
+/* ══════════ RECIBIR ENVÍOS DIRECTOS DE LA APP RELEVADOR ══════════
+ * La app manda POST con JSON: {clave, idApp, relevador, speciesId, _speciesName,
+ * parkId, parkName, lat, lng, _gpsAccuracy, addressOrZone, specimenCount,
+ * specimenType, estimatedAgeYears, curiosityFact, isDyePlant, fotoBase64, _fecha}
+ * La fila entra como PENDIENTE (mismo embudo que el formulario). Idempotente:
+ * reenviar el mismo registro no crea duplicados (id = 'app_' + idApp).
+ * La app confirma la recepción consultando /exec?accion=verificar&clave=…&callback=x */
+function doPost(e) {
+  try {
+    let raw = '';
+    if (e && e.parameter && e.parameter.payload) raw = e.parameter.payload;      // POST de formulario (la app)
+    else if (e && e.postData && e.postData.contents) raw = e.postData.contents;  // POST crudo (fetch/text-plain)
+    return json(enviarDesdeApp(JSON.parse(raw || '{}')));
+  } catch (err) {
+    return json({ ok: false, error: String(err) });
+  }
+}
+
+function enviarDesdeApp(d) {
+  if (d.clave !== CLAVE_ENVIO) throw new Error('clave de envío inválida');
+  const lat = Number(d.lat), lng = Number(d.lng);
+  if (isNaN(lat) || isNaN(lng)) throw new Error('coordenadas inválidas');
+  const id = 'app_' + String(d.idApp || (slug(String(d._speciesName || 'registro')) + '_' + Date.now().toString(36)));
+  const sh = hoja(HOJA_EJ);
+  const colA = sh.getRange(1, 1, Math.max(sh.getLastRow(), 1), 1).getValues();
+  for (let f = 0; f < colA.length; f++) {
+    if (colA[f][0] === id) return { ok: true, id: id, duplicado: true };
+  }
+  const fotoUrl = d.fotoBase64 ? guardarFoto(d.fotoBase64, id) : '';
+  sh.appendRow([id, new Date().toISOString(),
+    String(d.relevador || 'anónimo') + ' (app)',
+    String(d.speciesId || ('otra_' + slug(String(d._speciesName || 'sin_identificar')))),
+    String(d._speciesName || 'Sin identificar'),
+    String(d.parkId || 'otro'), String(d.parkName || 'Otro lugar'),
+    lat, lng, d._gpsAccuracy ? Number(d._gpsAccuracy) : null,
+    String(d.addressOrZone || ''), Number(d.specimenCount) || 1,
+    String(d.specimenType || 'Ejemplar único'), String(d.estimatedAgeYears || ''),
+    String(d.curiosityFact || ''), d.isDyePlant === true || d.isDyePlant === 'true',
+    fotoUrl, 'pendiente', '', '', '']);
+  notificarModeradores(id, String(d._speciesName || 'ejemplar'), lat, lng,
+    String(d.relevador || 'anónimo') + ' (app)', fotoUrl);
+  return { ok: true, id: id, duplicado: false };
+}
+
+/** dataURI base64 → archivo en Drive (visible por link) → URL miniatura */
+function guardarFoto(dataUri, id) {
+  try {
+    const m = String(dataUri).match(/^data:(image\/[\w+]+);base64,(.+)$/);
+    if (!m) return '';
+    const ext = m[1] === 'image/png' ? 'png' : 'jpg';
+    const archivo = DriveApp.createFile(Utilities.newBlob(Utilities.base64Decode(m[2]), m[1], id + '.' + ext));
+    archivo.setSharing(DriveApp.Access.ANYONE_WITH_LINK, DriveApp.Permission.VIEW);
+    return 'https://drive.google.com/thumbnail?id=' + archivo.getId() + '&sz=w640';
+  } catch (err) { return ''; }
+}
+
+/** La app consulta qué registros 'app_' ya llegaron, para marcar los confirmados */
+function verificarEnviosApp(p) {
+  if (String(p.clave || '') !== CLAVE_ENVIO) return { ok: false, error: 'clave inválida' };
+  const sh = hoja(HOJA_EJ);
+  const datos = sh.getDataRange().getValues();
+  const colId = datos[0].indexOf('id');
+  const ids = [];
+  for (let f = 1; f < datos.length; f++) {
+    const v = String(datos[f][colId] || '');
+    if (v.lastIndexOf('app_', 0) === 0) ids.push(v);
+  }
+  return { ok: true, cantidad: ids.length, ids: ids, pendientes: contar('pendiente') };
 }
 
 /* ══════════ PROCESAR ENVÍOS DEL FORMULARIO (disparador) ══════════ */
@@ -154,8 +231,8 @@ function asegurarPublica(celda) {
 function notificarModeradores(id, especie, lat, lng, relevador, fotoUrl) {
   const lista = moderadores().filter(Boolean);
   if (!lista.length) return;
-  const urlPanel = ScriptApp.getService().getUrl()
-    ? ScriptApp.getService().getUrl() + '?accion=panel' : '(abrir el panel desde la implementación)';
+  const base = URL_SERVICIO || ScriptApp.getService().getUrl() || '';
+  const urlPanel = base ? base + '?accion=panel' : '(abrir el panel desde la implementación)';
   MailApp.sendEmail({
     to: lista.join(','),
     subject: '🌿 Flora Rosario · envío pendiente de ' + especie,
