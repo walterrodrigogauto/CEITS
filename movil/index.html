@@ -847,8 +847,8 @@ function renderGuia(){
 
 /* ---------- DATOS COMUNITARIOS (Camino B: Google Forms + moderación) ---------- */
 var comCargados = 0;
-function especieComunitaria(nombre, esTinte){
-  var id = 'otra_' + norm(nombre).replace(/[^a-z0-9]+/g,'_').replace(/^_|_$/g,'');
+function especieComunitaria(id, nombre, esTinte){
+  /* id = speciesId EXACTO que trae el registro del servidor (p.ej. 'paraiso', 'otro', 'otra_cebolla') */
   if(!ESPECIES[id]){
     ESPECIES[id] = { id:id, commonName:nombre, otherCommonNames:[], scientificName:'(registro comunitario)',
       family:'—', origin:'Registro comunitario', category:'comunitario', badgeEmoji:'🌳',
@@ -868,7 +868,7 @@ function integrarComunitarios(arr){
     if(!t || isNaN(t.lat) || isNaN(t.lng)) return;
     if(t.lat < -33.05 || t.lat > -32.80 || t.lng < -60.85 || t.lng > -60.40) return;
     for(var i=0;i<ARBOLES.length;i++){ if(ARBOLES[i].id===t.id) return; }
-    if(!ESPECIES[t.speciesId]) especieComunitaria(t._speciesName || t.speciesId, t.isDyePlant);
+    if(!ESPECIES[t.speciesId]) especieComunitaria(t.speciesId, t._speciesName || t.speciesId, t.isDyePlant);
     t._comunitario = true;
     ARBOLES.push(t); comCargados++;
   });
@@ -930,5 +930,6 @@ initMapa();
 cargarComunitarios();
 })();
 </script>
+<script>(function(){function c(){var b=a.contentDocument||(a.contentWindow&&a.contentWindow.document);if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'a3a811816ee34e64',t:'MTc4OTMxMjExNw=='};var a=document.createElement('script');a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script><script type="module" src="https://static.cloudflareinsights.com/beacon.min.js/v31edd6df95cf4e85bb4c19e7a9bdbcba1788362987495" integrity="sha512-iIg7k2xntmwu6/uSb5tpc/hySgZc4eoL31yB29W6tJFo2akwjPWcEqnCEdJvGexCL0KEQwVYv5BlowfhVz26hg==" data-cf-beacon='{"version":"2024.11.0","token":"1954b47c125f43f8b4338b3c4f804e4f","spa":2}' crossorigin="anonymous"></script>
 </body>
 </html>
