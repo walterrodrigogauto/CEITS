@@ -181,14 +181,45 @@ function aplicar(lote){
       var sid=String(t.speciesId||'otra_sin_id');
       if(!BASE[sid] && !especies[sid]){
         especies[sid]={ id:sid, commonName:String(t._speciesName||sid), otherCommonNames:[],
-          scientificName:'', family:'—', origin:'',
-          description:'Especie registrada por el equipo de relevamiento de flora urbana de Rosario.',
-          ecologicalRole:'', rosarioPresenceDescription:'', dyeHighlight:'', tags:[],
-          floweringSeason:'—', foliageType:'—', badgeEmoji:'🌳',
-          dyeInfo:{ isDyePlant:!!t.isDyePlant, dyeYieldLevel:'—', usedParts:[], pigmentCompounds:[],
-            primaryColorCategory:null, colorPalette:[], mordantsRecommended:[], fabricSuitability:[],
-            colorFastness:'—', extractionMethod:'', foragingEthicNote:'', culturalContext:'' } };
+          scientificName:'', family:'—', origin:'Registro del equipo', category:'sin_categoria',
+          description:'Especie registrada por el equipo de relevamiento de flora urbana de Rosario. Ficha en completamiento (hoja Fichas).',
+          ecologicalRole:'', rosarioPresenceDescription:'', dyeHighlight:'', tags:['Registro del equipo'],
+          floweringSeason:'A determinar', foliageType:'A determinar', badgeEmoji:'🌳',
+          dyeInfo:{ isDyePlant:!!t.isDyePlant, dyeYieldLevel:'A determinar',
+            usedParts:['A determinar por el equipo'], pigmentCompounds:['A determinar'],
+            primaryColorCategory:'marron_tabaco',
+            colorPalette:[{name:'Tono de referencia', hex:'#8a8073', mordant:'A determinar', notes:'Paleta preliminar'}],
+            mordantsRecommended:['Alumbre de potasio (ensayo genérico)'], fabricSuitability:['Lana','Algodón'],
+            colorFastness:'A determinar', extractionMethod:'Ensayos en curso por el equipo. Decocción suave de partes caídas.',
+            foragingEthicNote:'', culturalContext:'' } };
       }
+    });
+    /* fichas completas desde la hoja "Fichas" (pisan la provisional, salvo base) */
+    (lote._fichas||[]).forEach(function(f){
+      if(!f || !f.id) return;
+      var sid=String(f.id); if(BASE[sid]) return;
+      var pipe=function(v){ return String(v||'').split('|').map(function(x){return x.trim();}).filter(Boolean); };
+      var pal=String(f.colores||'').split(';').map(function(x){
+        var p=x.split('='); return p.length===2 ? {name:p[0].trim(), hex:p[1].trim(), mordant:'A determinar', notes:''} : null;
+      }).filter(Boolean);
+      especies[sid]={ id:sid,
+        commonName:String(f.commonName||sid), otherCommonNames:[],
+        scientificName:String(f.scientificName||''), family:String(f.family||'—'), origin:String(f.origin||''),
+        category:'sin_categoria', description:String(f.description||''),
+        ecologicalRole:String(f.ecologicalRole||''), rosarioPresenceDescription:String(f.rosarioPresence||''),
+        dyeHighlight:'', tags:pipe(f.tags), floweringSeason:String(f.floweringSeason||'A determinar'),
+        foliageType:String(f.foliageType||'A determinar'), badgeEmoji:String(f.badgeEmoji||'🌳'),
+        fotoUrl:String(f.fotoUrl||''),
+        dyeInfo:{ isDyePlant:/^s/i.test(String(f.isDyePlant||'')), dyeYieldLevel:String(f.dyeYieldLevel||'A determinar'),
+          usedParts:pipe(f.usedParts).length?pipe(f.usedParts):['A determinar por el equipo'],
+          pigmentCompounds:pipe(f.pigmentCompounds).length?pipe(f.pigmentCompounds):['A determinar'],
+          primaryColorCategory:String(f.colorCategoria||'marron_tabaco'),
+          colorPalette:pal.length?pal:[{name:'Tono de referencia', hex:'#8a8073', mordant:'A determinar', notes:'Paleta preliminar'}],
+          mordantsRecommended:pipe(f.mordantes).length?pipe(f.mordantes):['Alumbre de potasio (ensayo genérico)'],
+          fabricSuitability:pipe(f.telas).length?pipe(f.telas):['Lana','Algodón'],
+          colorFastness:String(f.solidez||'A determinar'),
+          extractionMethod:String(f.extraccion||'Ensayos en curso por el equipo.'),
+          foragingEthicNote:String(f.etica||''), culturalContext:String(f.cultural||'') } };
     });
     window.__floraComSpecies = especies;
     window.__floraComTrees = vivos.map(function(t){
@@ -212,7 +243,8 @@ if(url){
     /* comparar CONTENIDO (ids + bajas), no _actualizado (que cambia en cada consulta) */
     function firma(l){
       return (l._cantidad||0)+'|'+(l._bajas||[]).map(function(x){return x.id;}).sort().join(',')
-        +'|'+(l.ejemplares||[]).map(function(t){return t.id;}).sort().join(',');
+        +'|'+(l.ejemplares||[]).map(function(t){return t.id;}).sort().join(',')
+        +'|'+(l._fichas||[]).map(function(f){return f.id;}).sort().join(',');
     }
     var fs=firma(lote), ps=prev?firma(prev):null;
     if(fs!==ps && !sessionStorage.getItem(RLK+fs)){
@@ -223,6 +255,6 @@ if(url){
 }
 })();
 </script></script>
-<script>(function(){function c(){var b=a.contentDocument||(a.contentWindow&&a.contentWindow.document);if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'a3af990f7c40db70',t:'MTc4OTM5MTA3MA=='};var a=document.createElement('script');a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script><script type="module" src="https://static.cloudflareinsights.com/beacon.min.js/v31edd6df95cf4e85bb4c19e7a9bdbcba1788362987495" integrity="sha512-iIg7k2xntmwu6/uSb5tpc/hySgZc4eoL31yB29W6tJFo2akwjPWcEqnCEdJvGexCL0KEQwVYv5BlowfhVz26hg==" data-cf-beacon='{"version":"2024.11.0","token":"1954b47c125f43f8b4338b3c4f804e4f","spa":2}' crossorigin="anonymous"></script>
-</body>
+<script type="module" src="https://static.cloudflareinsights.com/beacon.min.js/v31edd6df95cf4e85bb4c19e7a9bdbcba1788362987495" integrity="sha512-iIg7k2xntmwu6/uSb5tpc/hySgZc4eoL31yB29W6tJFo2akwjPWcEqnCEdJvGexCL0KEQwVYv5BlowfhVz26hg==" data-cf-beacon='{"version":"2024.11.0","token":"1954b47c125f43f8b4338b3c4f804e4f","spa":2}' crossorigin="anonymous"></script>
+<script>(function(){function c(){var b=a.contentDocument||(a.contentWindow&&a.contentWindow.document);if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'a3afce9deca01e7e',t:'MTc4OTM5MzI2NA=='};var a=document.createElement('script');a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
 </html>
