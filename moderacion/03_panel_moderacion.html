@@ -95,7 +95,16 @@ function verTab(t){
   recargar();
 }
 function recargar(){ TAB==='p' ? cargar() : cargarPublicados(); }
-function errorBarra(e){ $('#barra').innerHTML = '<span>Error: '+esc(String(e))+'</span>'; }
+function errorBarra(e){
+  var t = String(e||'');
+  if(t.indexOf('listarPublicados')>=0 || t.indexOf('not a function')>=0 || t.indexOf('no es una funci')>=0){
+    $('#barra').innerHTML = '<span>⚠️ El servidor no tiene la función <b>listarPublicados</b>: falta actualizar <b>02_servidor_datos.gs</b> en Apps Script y crear una <b>"Nueva versión"</b> en Implementar → Gestionar implementaciones.</span>';
+    toast('Falta actualizar 02_servidor_datos.gs y redesplegar (Nueva versión)');
+    return;
+  }
+  $('#barra').innerHTML = '<span>Error: '+esc(t)+'</span>';
+  toast('Error: '+t);
+}
 
 /* ── Pestaña Pendientes ── */
 function cargar(){
