@@ -604,8 +604,7 @@ function sheetArbol(id){
   var t = ARBOLES.find(function(x){return x.id===id;}); if(!t) return;
   var sp = especiePorId(t.speciesId);
   abrirSheet(
-    (sp? injectFoto('sp:'+sp.id, 'identificá esta especie en el terreno') : '')
-    + (t.foto? '<div class="foto-hero"><img src="'+esc(t.foto)+'" alt="" loading="lazy"><div class="lbl">📷 Foto del registro</div></div>' : (sp? injectFoto('sp:'+sp.id,''): ''))
+    (t.foto? '<div class="foto-hero"><img src="'+esc(t.foto)+'" alt="" loading="lazy"><div class="lbl">📷 Foto del registro</div></div>' : (sp? injectFoto('sp:'+sp.id,'identificá esta especie en el terreno'): ''))
     + '<div style="font-size:34px">'+(sp?esc(sp.badgeEmoji):'🌳')+'</div>'
     + '<div class="sheet-titulo">'+(sp?esc(sp.commonName):esc(t.speciesId))+'</div>'
     + '<div class="sheet-sub"><i>'+(sp?esc(sp.scientificName):'')+'</i></div>'
@@ -881,7 +880,6 @@ function integrarFichas(arr){
   (arr||[]).forEach(function(f){
     if(!f || !f.id) return;
     var id = String(f.id);
-    if(ESPECIES[id]) return;
     function pipe(v){ return String(v||'').split('|').map(function(x){return x.trim();}).filter(Boolean); }
     var pal = String(f.colores||'').split(';').map(function(x){
       var p = x.split('=');
@@ -977,6 +975,5 @@ initMapa();
 cargarComunitarios();
 })();
 </script>
-<script type="module" src="https://static.cloudflareinsights.com/beacon.min.js/v31edd6df95cf4e85bb4c19e7a9bdbcba1788362987495" integrity="sha512-iIg7k2xntmwu6/uSb5tpc/hySgZc4eoL31yB29W6tJFo2akwjPWcEqnCEdJvGexCL0KEQwVYv5BlowfhVz26hg==" data-cf-beacon='{"version":"2024.11.0","token":"1954b47c125f43f8b4338b3c4f804e4f","spa":2}' crossorigin="anonymous"></script>
-<script>(function(){function c(){var b=a.contentDocument||(a.contentWindow&&a.contentWindow.document);if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'a3afcfddfcb61e7e',t:'MTc4OTM5MzMxNQ=='};var a=document.createElement('script');a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
+</body>
 </html>
