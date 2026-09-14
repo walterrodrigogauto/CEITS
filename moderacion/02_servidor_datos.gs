@@ -33,6 +33,8 @@ const CLAVE_ENVIO = 'flora2026';                  // clave que trae la app relev
 
 const HOJA_EJ = 'Ejemplares';
 const HOJA_CFG = 'Config';
+const HOJA_BASE = 'Base';
+const HOJA_FICHAS = 'Fichas';   // fichas completas de especies nuevas (ver fichas-plantilla.csv)   // base central importada (base-para-importar.csv) para bajas desde el panel
 
 /* ══════════ ENTRADA WEB ══════════ */
 function doGet(e) {
@@ -40,7 +42,7 @@ function doGet(e) {
     const p = (e && e.parameter) || {};
     const accion = p.accion || 'datos';
     if (accion === 'ping') return json({ ok: true, ts: new Date().toISOString(), pendientes: contar('pendiente') });
-    if (accion === 'datos') return json(leerAprobados(), p.callback);
+    if (accion === 'datos') { const salida = leerAprobados(); salida._bajas = leerBajas(); salida._fichas = leerFichas(); return json(salida, p.callback); }
     if (accion === 'panel') return HtmlService.createHtmlOutputFromFile('03_panel_moderacion')
       .setTitle('Flora Rosario · Moderación').addMetaTag('viewport', 'width=device-width, initial-scale=1');
     if (accion === 'moderar') return json(moderarPorUrl(p.id, p.estado, p.pin, p.motivo));
@@ -158,6 +160,104 @@ function verificarEnviosApp(p) {
     if (v.lastIndexOf('app_', 0) === 0) ids.push(v);
   }
   return { ok: true, cantidad: ids.length, ids: ids, pendientes: contar('pendiente') };
+}
+
+/* ══════════ FICHAS DE ESPECIES (hoja "Fichas") ══════════
+ * Completar datos de especies nuevas: colores, receta, imagen de referencia…
+ * Las listas van separadas por | y los colores como Nombre=#hex;Nombre=#hex.
+ * Los loaders de los mapas las aplican a las especies que NO son de la base. */
+function leerFichas() {
+  const out = [];
+  try {
+    const sh = hoja(HOJA_FICHAS);
+    const datos = sh.getDataRange().getValues();
+    const col = n => datos[0].indexOf(n);
+    if (col('id') < 0) return out;
+    const g = (row, name) => col(name) >= 0 ? String(datos[row][col(name)] || '').trim() : '';
+    for (let f = 1; f < datos.length; f++) {
+      const id = g(f, 'id');
+      if (!id) continue;
+      out.push({ id: id, commonName: g(f,'commonName'), scientificName: g(f,'scientificName'),
+        family: g(f,'family'), origin: g(f,'origin'), description: g(f,'description'),
+        ecologicalRole: g(f,'ecologicalRole'), rosarioPresence: g(f,'rosarioPresence'),
+        floweringSeason: g(f,'floweringSeason'), foliageType: g(f,'foliageType'),
+        badgeEmoji: g(f,'badgeEmoji'), tags: g(f,'tags'), isDyePlant: g(f,'isDyePlant'),
+        dyeYieldLevel: g(f,'dyeYieldLevel'), usedParts: g(f,'usedParts'),
+        pigmentCompounds: g(f,'pigmentCompounds'), colorCategoria: g(f,'colorCategoria'),
+        colores: g(f,'colores'), mordantes: g(f,'mordantes'), telas: g(f,'telas'),
+        solidez: g(f,'solidez'), extraccion: g(f,'extraccion'), etica: g(f,'etica'),
+        cultural: g(f,'cultural'), fotoUrl: g(f,'fotoUrl') });
+    }
+  } catch (err) { /* la hoja Fichas todavía no existe */ }
+  return out;
+}
+
+/* ══════════ BASE CENTRAL · BAJAS ══════════
+ * La hoja "Base" (importada una vez con base-para-importar.csv) replica los
+ * ejemplares de la base central. estado ≠ 'aprobado' = dado de baja: el servidor
+ * lo publica en _bajas y los mapas lo ocultan solos. El panel (pestaña
+ * Publicados) escribe esta hoja con el botón "Dar de baja". */
+function leerBajas() {
+  const out = [];
+  try {
+    const sh = hoja(HOJA_BASE);
+    const datos = sh.getDataRange().getValues();
+    const enc = datos[0];
+    const col = n => enc.indexOf(n);
+    if (col('id') < 0 || col('estado') < 0) return out;
+    for (let f = 1; f < datos.length; f++) {
+      const est = String(datos[f][col('estado')] || '').trim().toLowerCase();
+      if (est && est !== 'aprobado') {
+        out.push({ id: String(datos[f][col('id')]),
+                   lat: Number(datos[f][col('lat')]), lng: Number(datos[f][col('lng')]) });
+      }
+    }
+  } catch (err) { /* la hoja Base todavía no se importó */ }
+  return out;
+}
+
+/** Panel · pestaña Publicados: aprobados comunitarios + base central */
+function listarPublicados(pin) {
+  if (!quienModifica(pin)) throw new Error('PIN inválido');
+  const com = [];
+  const sh = hoja(HOJA_EJ);
+  const datos = sh.getDataRange().getValues();
+  const col = n => datos[0].indexOf(n);
+  for (let f = 1; f < datos.length; f++) {
+    if (String(datos[f][col('estado')]) !== 'aprobado') continue;
+    com.push({ id: String(datos[f][col('id')]), _speciesName: String(datos[f][col('_speciesName')]),
+               parkName: String(datos[f][col('parkName')]), lat: datos[f][col('lat')], lng: datos[f][col('lng')],
+               fotoUrl: String(datos[f][col('fotoUrl')] || ''), _relevador: String(datos[f][col('relevador')] || '') });
+  }
+  const base = [];
+  try {
+    const shB = hoja(HOJA_BASE);
+    const dB = shB.getDataRange().getValues();
+    const cB = n => dB[0].indexOf(n);
+    for (let f = 1; f < dB.length; f++) {
+      if (String(dB[f][cB('estado')]).trim().toLowerCase() !== 'aprobado') continue;
+      base.push({ id: String(dB[f][cB('id')]), _speciesName: String(dB[f][cB('_speciesName')]),
+                  parkName: String(dB[f][cB('parkName')]), lat: dB[f][cB('lat')], lng: dB[f][cB('lng')] });
+    }
+  } catch (err) { /* Base aún no importada */ }
+  return { ok: true, comunitarios: com, base: base, bajas: leerBajas().length };
+}
+
+/** Panel · dar de baja / reactivar un ejemplar de la base central */
+function cambiarEstadoBase(id, nuevoEstado, pin) {
+  if (!quienModifica(pin)) throw new Error('PIN inválido');
+  const est = String(nuevoEstado || '').trim().toLowerCase();
+  if (est !== 'aprobado' && est !== 'baja') throw new Error('estado inválido');
+  const sh = hoja(HOJA_BASE);
+  const datos = sh.getDataRange().getValues();
+  const col = n => datos[0].indexOf(n);
+  for (let f = 1; f < datos.length; f++) {
+    if (String(datos[f][col('id')]) === String(id)) {
+      sh.getRange(f + 1, col('estado') + 1).setValue(est);
+      return { ok: true, id: id, estado: est };
+    }
+  }
+  throw new Error('id no encontrado en Base: ' + id);
 }
 
 /* ══════════ PROCESAR ENVÍOS DEL FORMULARIO (disparador) ══════════ */

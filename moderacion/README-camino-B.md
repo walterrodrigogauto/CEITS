@@ -106,3 +106,17 @@ La app tiene el botón **"🚀 Enviar registros nuevos al moderador"** (pestaña
 3. Reactivar: hoja "Base" → poner `estado = aprobado` en esa fila.
 
 El rechazo de pendientes también mejoró: motivo integrado en la tarjeta (sin ventanas emergentes, que el entorno de Google bloquea) y la tarjeta desaparece al instante al confirmar.
+
+
+---
+
+## 📖 Completar fichas de especies nuevas (hoja "Fichas")
+
+Los registros de especies que no están en la base publican una **ficha provisional** (con color de referencia y datos "A determinar") para que nada se rompa ni quede en blanco. Para completarla de verdad:
+
+1. **Una sola vez**: hoja de Google → Archivo → Importar → subir `fichas-plantilla.csv` → **"Insertar hoja nueva"** → renombrarla exactamente **`Fichas`**. (Trae una fila de ejemplo: Ginkgo Biloba, edítala o bórrala.)
+2. **Una fila por especie nueva**, con `id` = el que aparece como especie en el registro (ej: `ginkgo_biloba`; la lista de ids que faltan se ve en el panel → Publicados, o en el mapa tocando la ficha provisional).
+3. Reglas de formato: listas separadas por `|` (ej: `Lana|Seda`) · colores como `Nombre=#hex` separados por `;` (ej: `Amarillo miel=#E5C468;Ocre=#B8912F`) · `isDyePlant`: `sí`/`no` · `fotoUrl`: link de imagen (Drive compartido o Wikimedia) = **imagen de referencia** que se muestra en la ficha (móvil).
+4. **Publicar**: no hay que tocar nada más — la próxima apertura de los mapas trae las fichas actualizadas (en escritorio se recarga solo una vez).
+
+La hoja solo afecta especies **nuevas**: las 24 fichas curadas de la base jamás se pisan desde acá.
