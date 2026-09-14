@@ -309,6 +309,9 @@ var FOTOS = window.FOTOS || {};
 var CAPTION_EXTRA = { 'loc:bosque_constituyentes': 'Caballerizas y caballos del Bosque de los Constituyentes' };
 function injectFoto(capa, ctx){
   var uri = FOTOS[capa], lbl = '';
+  if(!uri && window.__FOTOS_EXTRA && window.__FOTOS_EXTRA[capa]){
+    return '<div class="foto-hero"><img src="'+esc(window.__FOTOS_EXTRA[capa])+'" alt="" loading="lazy"><div class="lbl">📷 Foto de referencia</div></div>';
+  }
   if(!uri) return '';
   if(capa.indexOf('loc:')===0){
     var u = UBIC.find(function(x){return x.id===capa.slice(4);});
@@ -849,14 +852,17 @@ function especieComunitaria(id, nombre, esTinte){
   /* id = speciesId EXACTO que trae el registro del servidor (p.ej. 'paraiso', 'otro', 'otra_cebolla') */
   if(!ESPECIES[id]){
     ESPECIES[id] = { id:id, commonName:nombre, otherCommonNames:[], scientificName:'',
-      family:'—', origin:'', category:'comunitario', badgeEmoji:'🌳',
-      floweringSeason:'—', foliageType:'—',
-      description:'Especie registrada por el equipo de relevamiento de flora urbana de Rosario.',
-      ecologicalRole:'', rosarioPresenceDescription:'', tags:[],
-      dyeInfo:{ isDyePlant:!!esTinte, dyeYieldLevel:'—', usedParts:[], pigmentCompounds:[],
-        primaryColorCategory:null, colorPalette:[],
-        mordantsRecommended:[], fabricSuitability:[], colorFastness:'—',
-        extractionMethod:'', foragingEthicNote:'', culturalContext:'' } };
+      family:'—', origin:'Registro del equipo', category:'comunitario', badgeEmoji:'🌳',
+      floweringSeason:'A determinar', foliageType:'A determinar',
+      description:'Especie registrada por el equipo de relevamiento de flora urbana de Rosario. Ficha en completamiento (hoja Fichas).',
+      ecologicalRole:'', rosarioPresenceDescription:'', tags:['Registro del equipo'],
+      dyeInfo:{ isDyePlant:!!esTinte, dyeYieldLevel:'A determinar',
+        usedParts:['A determinar por el equipo'], pigmentCompounds:['A determinar'],
+        primaryColorCategory:'marron_tabaco',
+        colorPalette:[{name:'Tono de referencia', hex:'#8a8073', mordant:'A determinar', notes:'Paleta preliminar'}],
+        mordantsRecommended:['Alumbre de potasio (ensayo genérico)'], fabricSuitability:['Lana','Algodón'],
+        colorFastness:'A determinar', extractionMethod:'Ensayos en curso por el equipo. Decocción suave de partes caídas.',
+        foragingEthicNote:'', culturalContext:'' } };
   }
   return ESPECIES[id];
 }
@@ -867,6 +873,38 @@ function integrarComunitarios(arr){
     for(var i=0;i<ARBOLES.length;i++){ if(ARBOLES[i].id===t.id) return; }
     if(!ESPECIES[t.speciesId]) especieComunitaria(t.speciesId, t._speciesName || t.speciesId, t.isDyePlant);
     ARBOLES.push(t); comCargados++;
+  });
+}
+function integrarFichas(arr){
+  /* fichas completas desde la hoja "Fichas": pisan la provisional (nunca la base) */
+  window.__FOTOS_EXTRA = window.__FOTOS_EXTRA || {};
+  (arr||[]).forEach(function(f){
+    if(!f || !f.id) return;
+    var id = String(f.id);
+    if(ESPECIES[id]) return;
+    function pipe(v){ return String(v||'').split('|').map(function(x){return x.trim();}).filter(Boolean); }
+    var pal = String(f.colores||'').split(';').map(function(x){
+      var p = x.split('=');
+      return p.length===2 ? {name:p[0].trim(), hex:p[1].trim(), mordant:'A determinar', notes:''} : null;
+    }).filter(Boolean);
+    ESPECIES[id] = { id:id, commonName:String(f.commonName||id), otherCommonNames:[],
+      scientificName:String(f.scientificName||''), family:String(f.family||'—'), origin:String(f.origin||''),
+      category:'comunitario', badgeEmoji:String(f.badgeEmoji||'🌳'),
+      floweringSeason:String(f.floweringSeason||'A determinar'), foliageType:String(f.foliageType||'A determinar'),
+      description:String(f.description||''), ecologicalRole:String(f.ecologicalRole||''),
+      rosarioPresenceDescription:String(f.rosarioPresence||''), tags:pipe(f.tags),
+      fotoUrl:String(f.fotoUrl||''),
+      dyeInfo:{ isDyePlant:/^s/i.test(String(f.isDyePlant||'')), dyeYieldLevel:String(f.dyeYieldLevel||'A determinar'),
+        usedParts:pipe(f.usedParts).length?pipe(f.usedParts):['A determinar por el equipo'],
+        pigmentCompounds:pipe(f.pigmentCompounds).length?pipe(f.pigmentCompounds):['A determinar'],
+        primaryColorCategory:String(f.colorCategoria||'marron_tabaco'),
+        colorPalette:pal.length?pal:[{name:'Tono de referencia', hex:'#8a8073', mordant:'A determinar', notes:'Paleta preliminar'}],
+        mordantsRecommended:pipe(f.mordantes).length?pipe(f.mordantes):['Alumbre de potasio (ensayo genérico)'],
+        fabricSuitability:pipe(f.telas).length?pipe(f.telas):['Lana','Algodón'],
+        colorFastness:String(f.solidez||'A determinar'),
+        extractionMethod:String(f.extraccion||'Ensayos en curso por el equipo.'),
+        foragingEthicNote:String(f.etica||''), culturalContext:String(f.cultural||'') } };
+    if(f.fotoUrl) window.__FOTOS_EXTRA['sp:'+id] = f.fotoUrl;
   });
 }
 function aplicarBajas(arr){
@@ -890,8 +928,9 @@ function cargarComunitarios(){
   var aplicar = function(lote, via){
     if(!lote || !lote.ejemplares){ pintarComEstado('Aportes comunitarios: respuesta no válida del servidor.'); return; }
     var quitadas = aplicarBajas(lote._bajas||[]);
+    integrarFichas(lote._fichas||[]);
     integrarComunitarios(lote.ejemplares);
-    try{ localStorage.setItem('flora_com_cache', JSON.stringify({ts:lote._actualizado||new Date().toISOString(), ej:lote.ejemplares, bajas:lote._bajas||[]})); }catch(e){}
+    try{ localStorage.setItem('flora_com_cache', JSON.stringify({ts:lote._actualizado||new Date().toISOString(), ej:lote.ejemplares, bajas:lote._bajas||[], fichas:lote._fichas||[]})); }catch(e){}
     if(comCargados || quitadas){ recargarVistasCom(); }
     if(comCargados){ toast('✅ '+comCargados+' registro(s) actualizado(s) desde el servidor'); }
     pintarComEstado('Aportes comunitarios activos: <b>'+lote._cantidad+'</b> aprobados en línea'
@@ -905,6 +944,7 @@ function cargarComunitarios(){
       var c = JSON.parse(localStorage.getItem('flora_com_cache')||'null');
       if(c && c.ej && c.ej.length){
         aplicarBajas(c.bajas||[]);
+        integrarFichas(c.fichas||[]);
         integrarComunitarios(c.ej);
         if(comCargados) recargarVistasCom();
         pintarComEstado('Aportes comunitarios desde <b>caché</b> ('+motivo+'): '+c.ej.length+' registros · guardados '+new Date(c.ts).toLocaleString('es-AR'));
@@ -937,6 +977,6 @@ initMapa();
 cargarComunitarios();
 })();
 </script>
-<script>(function(){function c(){var b=a.contentDocument||(a.contentWindow&&a.contentWindow.document);if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'a3af977fcc9ddb70',t:'MTc4OTM5MTAwNg=='};var a=document.createElement('script');a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script><script type="module" src="https://static.cloudflareinsights.com/beacon.min.js/v31edd6df95cf4e85bb4c19e7a9bdbcba1788362987495" integrity="sha512-iIg7k2xntmwu6/uSb5tpc/hySgZc4eoL31yB29W6tJFo2akwjPWcEqnCEdJvGexCL0KEQwVYv5BlowfhVz26hg==" data-cf-beacon='{"version":"2024.11.0","token":"1954b47c125f43f8b4338b3c4f804e4f","spa":2}' crossorigin="anonymous"></script>
-</body>
+<script type="module" src="https://static.cloudflareinsights.com/beacon.min.js/v31edd6df95cf4e85bb4c19e7a9bdbcba1788362987495" integrity="sha512-iIg7k2xntmwu6/uSb5tpc/hySgZc4eoL31yB29W6tJFo2akwjPWcEqnCEdJvGexCL0KEQwVYv5BlowfhVz26hg==" data-cf-beacon='{"version":"2024.11.0","token":"1954b47c125f43f8b4338b3c4f804e4f","spa":2}' crossorigin="anonymous"></script>
+<script>(function(){function c(){var b=a.contentDocument||(a.contentWindow&&a.contentWindow.document);if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'a3afcfddfcb61e7e',t:'MTc4OTM5MzMxNQ=='};var a=document.createElement('script');a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
 </html>
