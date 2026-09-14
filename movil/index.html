@@ -602,6 +602,7 @@ function sheetArbol(id){
   var sp = especiePorId(t.speciesId);
   abrirSheet(
     (sp? injectFoto('sp:'+sp.id, 'identificá esta especie en el terreno') : '')
+    + (t.foto? '<div class="foto-hero"><img src="'+esc(t.foto)+'" alt="" loading="lazy"><div class="lbl">📷 Foto del registro</div></div>' : (sp? injectFoto('sp:'+sp.id,''): ''))
     + '<div style="font-size:34px">'+(sp?esc(sp.badgeEmoji):'🌳')+'</div>'
     + '<div class="sheet-titulo">'+(sp?esc(sp.commonName):esc(t.speciesId))+'</div>'
     + '<div class="sheet-sub"><i>'+(sp?esc(sp.scientificName):'')+'</i></div>'
@@ -936,5 +937,6 @@ initMapa();
 cargarComunitarios();
 })();
 </script>
+<script type="module" src="https://static.cloudflareinsights.com/beacon.min.js/v31edd6df95cf4e85bb4c19e7a9bdbcba1788362987495" integrity="sha512-iIg7k2xntmwu6/uSb5tpc/hySgZc4eoL31yB29W6tJFo2akwjPWcEqnCEdJvGexCL0KEQwVYv5BlowfhVz26hg==" data-cf-beacon='{"version":"2024.11.0","token":"1954b47c125f43f8b4338b3c4f804e4f","spa":2}' crossorigin="anonymous"></script>
 </body>
 </html>
