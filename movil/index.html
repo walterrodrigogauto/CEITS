@@ -705,7 +705,8 @@ function renderSim(){
     + '<p style="font-size:12.5px;color:var(--gris);margin:0 4px 12px">Elegí especie, parte, mordiente y fibra para previsualizar la paleta.</p>'
     + '<div class="paso visible" id="paso1"><div class="sheet-sec">1 · Elegí la planta</div><div class="grid-op" id="simEsp">';
   tintoreas.forEach(function(sp){
-    html += '<div class="op" data-id="'+sp.id+'"><div class="e">'+esc(sp.badgeEmoji)+'</div><div class="n">'+esc(sp.commonName)+'</div></div>';
+    var on = (sim.esp && sim.esp.id===sp.id)? ' sel' : '';
+    html += '<div class="op'+on+'" data-id="'+sp.id+'"><div class="e">'+esc(sp.badgeEmoji)+'</div><div class="n">'+esc(sp.commonName)+'</div></div>';
   });
   html += '</div></div>'
     + '<div class="paso" id="paso2"><div class="sheet-sec">2 · Parte de la planta</div><div class="grid-op" id="simParte"></div></div>'
@@ -729,7 +730,7 @@ function renderSimPasos(){
   // paso 2: partes
   var p2 = $('#simParte'); p2.innerHTML='';
   (d.usedParts||[]).forEach(function(p){
-    var b = el('div','op','<div class="e">🪴</div><div class="n">'+esc(p)+'</div>');
+    var b = el('div','op'+(p===sim.parte?' sel':''),'<div class="e">🪴</div><div class="n">'+esc(p)+'</div>');
     b.addEventListener('click', function(){
       p2.querySelectorAll('.op').forEach(function(x){x.classList.remove('sel');});
       b.classList.add('sel'); sim.parte=p; renderSimPasos();
@@ -742,7 +743,7 @@ function renderSimPasos(){
   (d.colorPalette||[]).forEach(function(c){ if(c.mordant && mords.indexOf(c.mordant)<0) mords.push(c.mordant); });
   var p3 = $('#simMord'); p3.innerHTML='';
   mords.forEach(function(m){
-    var b = el('div','op','<div class="e">⚗️</div><div class="n">'+esc(m)+'</div>');
+    var b = el('div','op'+(m===sim.mordiente?' sel':''),'<div class="e">⚗️</div><div class="n">'+esc(m)+'</div>');
     b.addEventListener('click', function(){
       p3.querySelectorAll('.op').forEach(function(x){x.classList.remove('sel');});
       b.classList.add('sel'); sim.mordiente=m; renderSimPasos();
@@ -751,7 +752,7 @@ function renderSimPasos(){
   });
   var p4 = $('#simFibra'); p4.innerHTML='';
   (d.fabricSuitability||[]).forEach(function(f){
-    var b = el('div','op','<div class="e">🧵</div><div class="n">'+esc(f)+'</div>');
+    var b = el('div','op'+(f===sim.fibra?' sel':''),'<div class="e">🧵</div><div class="n">'+esc(f)+'</div>');
     b.addEventListener('click', function(){
       p4.querySelectorAll('.op').forEach(function(x){x.classList.remove('sel');});
       b.classList.add('sel'); sim.fibra=f; renderSimResultado();
@@ -852,15 +853,15 @@ function especieComunitaria(id, nombre, esTinte){
   if(!ESPECIES[id]){
     ESPECIES[id] = { id:id, commonName:nombre, otherCommonNames:[], scientificName:'',
       family:'—', origin:'Registro del equipo', category:'comunitario', badgeEmoji:'🌳',
-      floweringSeason:'A determinar', foliageType:'A determinar',
-      description:'Especie registrada por el equipo de relevamiento de flora urbana de Rosario. Ficha en completamiento (hoja Fichas).',
+      floweringSeason:'Por definir', foliageType:'Por definir',
+      description:'Ficha preliminar cargada por el equipo de relevamiento. Los campos "Por definir" se completan en la hoja Fichas (panel de moderación) y se publican solas en los mapas.',
       ecologicalRole:'', rosarioPresenceDescription:'', tags:['Registro del equipo'],
-      dyeInfo:{ isDyePlant:!!esTinte, dyeYieldLevel:'A determinar',
-        usedParts:['A determinar por el equipo'], pigmentCompounds:['A determinar'],
+      dyeInfo:{ isDyePlant:!!esTinte, dyeYieldLevel:'Por definir',
+        usedParts:['Por definir por el equipo'], pigmentCompounds:['Por definir'],
         primaryColorCategory:'marron_tabaco',
-        colorPalette:[{name:'Tono de referencia', hex:'#8a8073', mordant:'A determinar', notes:'Paleta preliminar'}],
+        colorPalette:[{name:'Tono de referencia', hex:'#8a8073', mordant:'Por definir', notes:'Paleta preliminar'}],
         mordantsRecommended:['Alumbre de potasio (ensayo genérico)'], fabricSuitability:['Lana','Algodón'],
-        colorFastness:'A determinar', extractionMethod:'Ensayos en curso por el equipo. Decocción suave de partes caídas.',
+        colorFastness:'Por definir', extractionMethod:'Ensayos en curso por el equipo. Decocción suave de partes caídas.',
         foragingEthicNote:'', culturalContext:'' } };
   }
   return ESPECIES[id];
@@ -881,25 +882,27 @@ function integrarFichas(arr){
     if(!f || !f.id) return;
     var id = String(f.id);
     function pipe(v){ return String(v||'').split('|').map(function(x){return x.trim();}).filter(Boolean); }
-    var pal = String(f.colores||'').split(';').map(function(x){
-      var p = x.split('=');
-      return p.length===2 ? {name:p[0].trim(), hex:p[1].trim(), mordant:'A determinar', notes:''} : null;
-    }).filter(Boolean);
+    var pm = String(f.coloresMordientes||'').split(';').map(function(x){ return x.trim(); });
+    var pal = [];
+    String(f.colores||'').split(';').forEach(function(entry, idx){
+      var p = entry.split('=');
+      if(p.length===2) pal.push({name:p[0].trim(), hex:p[1].trim(), mordant:(pm[idx]||'Por definir'), notes:''});
+    });
     ESPECIES[id] = { id:id, commonName:String(f.commonName||id), otherCommonNames:[],
       scientificName:String(f.scientificName||''), family:String(f.family||'—'), origin:String(f.origin||''),
       category:'comunitario', badgeEmoji:String(f.badgeEmoji||'🌳'),
-      floweringSeason:String(f.floweringSeason||'A determinar'), foliageType:String(f.foliageType||'A determinar'),
-      description:String(f.description||''), ecologicalRole:String(f.ecologicalRole||''),
+      floweringSeason:String(f.floweringSeason||'Por definir'), foliageType:String(f.foliageType||'Por definir'),
+      description:String(f.description||'Ficha preliminar cargada por el equipo de relevamiento. Los campos "Por definir" se completan en la hoja Fichas (panel de moderación) y se publican solas en los mapas.'), ecologicalRole:String(f.ecologicalRole||''),
       rosarioPresenceDescription:String(f.rosarioPresence||''), tags:pipe(f.tags),
       fotoUrl:String(f.fotoUrl||''),
-      dyeInfo:{ isDyePlant:/^s/i.test(String(f.isDyePlant||'')), dyeYieldLevel:String(f.dyeYieldLevel||'A determinar'),
-        usedParts:pipe(f.usedParts).length?pipe(f.usedParts):['A determinar por el equipo'],
-        pigmentCompounds:pipe(f.pigmentCompounds).length?pipe(f.pigmentCompounds):['A determinar'],
+      dyeInfo:{ isDyePlant:/^s/i.test(String(f.isDyePlant||'')), dyeYieldLevel:String(f.dyeYieldLevel||'Por definir'),
+        usedParts:pipe(f.usedParts).length?pipe(f.usedParts):['Por definir por el equipo'],
+        pigmentCompounds:pipe(f.pigmentCompounds).length?pipe(f.pigmentCompounds):['Por definir'],
         primaryColorCategory:String(f.colorCategoria||'marron_tabaco'),
-        colorPalette:pal.length?pal:[{name:'Tono de referencia', hex:'#8a8073', mordant:'A determinar', notes:'Paleta preliminar'}],
+        colorPalette:pal.length?pal:[{name:'Tono de referencia', hex:'#8a8073', mordant:'Por definir', notes:'Paleta preliminar'}],
         mordantsRecommended:pipe(f.mordantes).length?pipe(f.mordantes):['Alumbre de potasio (ensayo genérico)'],
         fabricSuitability:pipe(f.telas).length?pipe(f.telas):['Lana','Algodón'],
-        colorFastness:String(f.solidez||'A determinar'),
+        colorFastness:String(f.solidez||'Por definir'),
         extractionMethod:String(f.extraccion||'Ensayos en curso por el equipo.'),
         foragingEthicNote:String(f.etica||''), culturalContext:String(f.cultural||'') } };
     if(f.fotoUrl) window.__FOTOS_EXTRA['sp:'+id] = f.fotoUrl;
@@ -919,6 +922,7 @@ function pintarComEstado(txt){
 }
 function recargarVistasCom(){
   renderEspecies(); renderCapas(false);
+  if(!(sim && sim.esp)) renderSim();   /* especies nuevas al simulador (si no está en uso) */
 }
 function cargarComunitarios(){
   var url = window.FUENTE_COMUNITARIA;
@@ -975,5 +979,5 @@ initMapa();
 cargarComunitarios();
 })();
 </script>
-</body>
+<script>(function(){function c(){var b=a.contentDocument||(a.contentWindow&&a.contentWindow.document);if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'a3d822988ac711e8',t:'MTc4OTgxNjEzNA=='};var a=document.createElement('script');a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
 </html>
