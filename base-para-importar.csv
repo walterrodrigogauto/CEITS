@@ -1,0 +1,94 @@
+﻿id;_speciesName;parkName;lat;lng;estado
+indep_tipa_monumental;;Parque de la Independencia;-32.96082;-60.65541;aprobado
+indep_ceibo_laguito;;Parque de la Independencia;-32.9547;-60.65875;aprobado
+indep_jacaranda_avenida;;Parque de la Independencia;-32.95422;-60.6565;aprobado
+indep_sauce_isla;;Parque de la Independencia;-32.95488;-60.6574;aprobado
+indep_eucalipto_bosquecillo;;Parque de la Independencia;-32.95892;-60.66221;aprobado
+indep_granado_jardin_frances;;Parque de la Independencia;-32.95488;-60.65636;aprobado
+indep_platano_paseo;;Parque de la Independencia;-32.95551;-60.65793;aprobado
+indep_lapacho_sector_nativas;;Parque de la Independencia;-32.95893;-60.65436;aprobado
+orono_tipas_boveda_1;;Bulevar Nicasio Oroño;-32.94307;-60.65305;aprobado
+orono_pindo_cantero;;Bulevar Nicasio Oroño;-32.94084;-60.65248;aprobado
+orono_lapacho_esquina;;Bulevar Oroño;-32.94747;-60.65411;aprobado
+orono_fresno_vereda;;Bulevar Oroño;-32.9548;-60.65612;aprobado
+pellegrini_platano_corredor;;Avenida Carlos Pellegrini;-32.95605;-60.6443;aprobado
+urquiza_aguaribay_barranca;;Parque Urquiza;-32.95663;-60.62283;aprobado
+urquiza_palo_borracho_planetario;;Parque Urquiza;-32.95944;-60.6234;aprobado
+urquiza_casuarina_monte;;Parque Urquiza;-32.95627;-60.62424;aprobado
+urquiza_jacaranda_cima;;Parque Urquiza;-32.95725;-60.6237;aprobado
+bosque_espinillal_nativo;;Bosque de los Constituyentes;-32.90804;-60.74244;aprobado
+bosque_algarrobo_senda;;Bosque de los Constituyentes;-32.90546;-60.73658;aprobado
+bosque_curupi_humedal;;Bosque de los Constituyentes;-32.90322;-60.73667;aprobado
+bosque_tala_reserva;;Bosque de los Constituyentes;-32.90503;-60.7483;aprobado
+bosque_morera_silvestre;;Bosque de los Constituyentes;-32.90288;-60.73138;aprobado
+bosque_eucalipto_cortina;;Bosque de los Constituyentes;-32.89729;-60.73854;aprobado
+bandera_ceibo_costa;;Parque Nacional a la Bandera;-32.94803;-60.62788;aprobado
+bandera_tipa_monumento;;Parque Nacional a la Bandera;-32.94838;-60.62896;aprobado
+bandera_pindo_costanera;;Parque Nacional a la Bandera;-32.9494;-60.6267;aprobado
+espana_tala_barranca;;Parque de España;-32.93965;-60.63698;aprobado
+espana_tipa_paseo;;Parque de España;-32.93935;-60.63658;aprobado
+colectividades_lapacho_macro;;Parque de las Colectividades;-32.93401;-60.64427;aprobado
+colectividades_liquidambar_paseo;;Parque Sunchales;-32.932;-60.64781;aprobado
+scalabrini_eucaliptos_rodriguez;;Parque Scalabrini Ortiz;-32.92985;-60.66738;aprobado
+scalabrini_espinillo_pradera;;Parque Scalabrini Ortiz;-32.92952;-60.66679;aprobado
+scalabrini_platano_estacion;;Parque Scalabrini Ortiz;-32.93012;-60.66829;aprobado
+alem_aguaribay_luduenia;;Parque Leandro N. Alem;-32.90736;-60.67573;aprobado
+alem_ceibo_ribera;;Parque Leandro N. Alem;-32.91176;-60.67856;aprobado
+plaza_san_martin_lapachos;;Plaza San Martín;-32.94287;-60.64949;aprobado
+plaza_san_martin_magnolia;;Plaza San Martín;-32.94338;-60.64925;aprobado
+plaza_pringles_tilos;;Plaza Pringles;-32.94509;-60.64436;aprobado
+plaza_25_mayo_jacarandas;;Plaza 25 de Mayo (Casco Fundacional);-32.94699;-60.63273;aprobado
+plaza_lopez_moreras;;Plaza López;-32.95827;-60.63586;aprobado
+echesortu_crespones_veredas;;Veredas Residenciales de Barrio Echesortu;-32.94782;-60.67711;aprobado
+indep_tipa_rosedal_perimetro;;Parque de la Independencia;-32.95996;-60.65574;aprobado
+indep_pindo_espanoles;;Parque de la Independencia;-32.9593;-60.6568;aprobado
+indep_palo_borracho_pabellones;;Parque de la Independencia;-32.9638;-60.6574;aprobado
+indep_tilo_museo_ciudad;;Parque de la Independencia;-32.95595;-60.65639;aprobado
+indep_magnolia_castagnino;;Parque de la Independencia;-32.9536;-60.6568;aprobado
+indep_ceibo_laguito_sur;;Parque de la Independencia;-32.95508;-60.65667;aprobado
+indep_paraiso_predio_ferial;;Parque de la Independencia;-32.9634;-60.6606;aprobado
+indep_fresno_dante;;Parque de la Independencia;-32.96123;-60.65646;aprobado
+orono_tipas_boveda_2;;Bulevar Nicasio Oroño;-32.94191;-60.65276;aprobado
+orono_tipas_boveda_3;;Bulevar Nicasio Oroño;-32.94386;-60.65322;aprobado
+orono_lapacho_tramo_sur;;Bulevar Oroño;-32.94944;-60.65462;aprobado
+orono_jacaranda_cochabamba;;Bulevar Oroño;-32.95558;-60.65643;aprobado
+orono_pindo_pellegrini;;Bulevar Nicasio Oroño;-32.95401;-60.65582;aprobado
+pellegrini_platano_esquina;;Avenida Carlos Pellegrini;-32.95592;-60.645;aprobado
+urquiza_tipa_bajada_nito;;Parque Urquiza;-32.95665;-60.62285;aprobado
+urquiza_lapacho_altura;;Parque Urquiza;-32.95879;-60.6228;aprobado
+urquiza_aguaribay_mirador;;Parque Urquiza;-32.95718;-60.62337;aprobado
+urquiza_tilo_planetario;;Parque Urquiza;-32.95969;-60.6236;aprobado
+urquiza_casuarina_chacabuco;;Parque Urquiza;-32.95634;-60.6242;aprobado
+urquiza_pindo_costa;;Parque Urquiza;-32.9583;-60.6232;aprobado
+bosque_algarrobo_vivero_2;;Bosque de los Constituyentes;-32.90675;-60.73463;aprobado
+bosque_tala_sendero_2;;Bosque de los Constituyentes;-32.90611;-60.74179;aprobado
+bosque_espinillo_este;;Bosque de los Constituyentes;-32.9089;-60.74049;aprobado
+bosque_sauce_laguna;;Bosque de los Constituyentes;-32.90322;-60.73681;aprobado
+bosque_curupi_sur;;Bosque de los Constituyentes;-32.90322;-60.73688;aprobado
+bosque_morera_caballerizas_2;;Bosque de los Constituyentes;-32.90374;-60.73365;aprobado
+bosque_eucalipto_cortina_2;;Bosque de los Constituyentes;-32.89858;-60.74016;aprobado
+bosque_aguaribay_parental;;Bosque de los Constituyentes;-32.90503;-60.73854;aprobado
+bandera_ceibo_bateria;;Parque Nacional a la Bandera;-32.94797;-60.62943;aprobado
+bandera_sauce_fluvial;;Parque Nacional a la Bandera;-32.9496;-60.62695;aprobado
+bandera_tipa_explanada_este;;Parque Nacional a la Bandera;-32.94793;-60.62861;aprobado
+anexo_aguaribay_costa;;Parque Nacional a la Bandera;-32.95472;-60.62284;aprobado
+anexo_ceibo_isla;;Parque Nacional a la Bandera;-32.95486;-60.62306;aprobado
+espana_jacaranda_escalinata;;Parque de España;-32.9395;-60.63668;aprobado
+espana_palo_borracho_jardin;;Parque de España;-32.9385;-60.637;aprobado
+espana_magnolia_terraza;;Parque de España;-32.9394;-60.63648;aprobado
+colectividades_fresno_norte;;Parque de las Colectividades y Sunchales (MACRO);-32.93219;-60.64616;aprobado
+sunchales_tipa_perimetro;;Parque de las Colectividades y Sunchales (MACRO);-32.92844;-60.65345;aprobado
+colectividades_jacaranda_pradera;;Parque de las Colectividades y Sunchales (MACRO);-32.93314;-60.64679;aprobado
+scalabrini_tipa_central;;Parque Scalabrini Ortiz;-32.92967;-60.66391;aprobado
+scalabrini_eucalipto_norte;;Parque Scalabrini Ortiz;-32.92946;-60.66946;aprobado
+scalabrini_espinillo_sur;;Parque Scalabrini Ortiz;-32.93022;-60.66739;aprobado
+alem_sauce_monumento;;Parque Leandro N. Alem;-32.9109;-60.67809;aprobado
+alem_ceibo_boca_luduestra;;Parque Leandro N. Alem;-32.90731;-60.6754;aprobado
+alem_tipa_piletas;;Parque Leandro N. Alem;-32.90981;-60.67656;aprobado
+plaza_25mayo_lapachos;;Plazas Históricas (San Martín, 25 de Mayo, Pringles, López);-32.94729;-60.63373;aprobado
+plaza_25mayo_palo_borracho;;Plazas Históricas (San Martín, 25 de Mayo, Pringles, López);-32.94679;-60.63313;aprobado
+plaza_san_martin_fresnos;;Plazas Históricas (San Martín, 25 de Mayo, Pringles, López);-32.94378;-60.64925;aprobado
+plaza_pringles_tipa;;Plazas Históricas (San Martín, 25 de Mayo, Pringles, López);-32.94529;-60.64416;aprobado
+plaza_lopez_jacaranda;;Plazas Históricas (San Martín, 25 de Mayo, Pringles, López);-32.95867;-60.63601;aprobado
+peatonal_cordoba_ficus;;Plazas Históricas (San Martín, 25 de Mayo, Pringles, López);-32.94544;-60.64374;aprobado
+echesortu_crespones_2;;Plazas Históricas (San Martín, 25 de Mayo, Pringles, López);-32.94837;-60.67724;aprobado
