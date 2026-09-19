@@ -182,15 +182,15 @@ function aplicar(lote){
       if(!BASE[sid] && !especies[sid]){
         especies[sid]={ id:sid, commonName:String(t._speciesName||sid), otherCommonNames:[],
           scientificName:'', family:'—', origin:'Registro del equipo', category:'sin_categoria',
-          description:'Especie registrada por el equipo de relevamiento de flora urbana de Rosario. Ficha en completamiento (hoja Fichas).',
+          description:'Ficha preliminar cargada por el equipo de relevamiento. Los campos "Por definir" se completan en la hoja Fichas (panel de moderación) y se publican solas en los mapas.',
           ecologicalRole:'', rosarioPresenceDescription:'', dyeHighlight:'', tags:['Registro del equipo'],
-          floweringSeason:'A determinar', foliageType:'A determinar', badgeEmoji:'🌳',
-          dyeInfo:{ isDyePlant:!!t.isDyePlant, dyeYieldLevel:'A determinar',
-            usedParts:['A determinar por el equipo'], pigmentCompounds:['A determinar'],
+          floweringSeason:'Por definir', foliageType:'Por definir', badgeEmoji:'🌳',
+          dyeInfo:{ isDyePlant:!!t.isDyePlant, dyeYieldLevel:'Por definir',
+            usedParts:['Por definir por el equipo'], pigmentCompounds:['Por definir'],
             primaryColorCategory:'marron_tabaco',
-            colorPalette:[{name:'Tono de referencia', hex:'#8a8073', mordant:'A determinar', notes:'Paleta preliminar'}],
+            colorPalette:[{name:'Tono de referencia', hex:'#8a8073', mordant:'Por definir', notes:'Paleta preliminar'}],
             mordantsRecommended:['Alumbre de potasio (ensayo genérico)'], fabricSuitability:['Lana','Algodón'],
-            colorFastness:'A determinar', extractionMethod:'Ensayos en curso por el equipo. Decocción suave de partes caídas.',
+            colorFastness:'Por definir', extractionMethod:'Ensayos en curso por el equipo. Decocción suave de partes caídas.',
             foragingEthicNote:'', culturalContext:'' } };
       }
     });
@@ -199,25 +199,27 @@ function aplicar(lote){
       if(!f || !f.id) return;
       var sid=String(f.id);   /* pisa también fichas de la base: la hoja Fichas es la fuente editorial */
       var pipe=function(v){ return String(v||'').split('|').map(function(x){return x.trim();}).filter(Boolean); };
-      var pal=String(f.colores||'').split(';').map(function(x){
-        var p=x.split('='); return p.length===2 ? {name:p[0].trim(), hex:p[1].trim(), mordant:'A determinar', notes:''} : null;
-      }).filter(Boolean);
+      var pm=String(f.coloresMordientes||'').split(';').map(function(x){ return x.trim(); });
+      var pal=[];
+      String(f.colores||'').split(';').forEach(function(entry, idx){
+        var p=entry.split('='); if(p.length===2) pal.push({name:p[0].trim(), hex:p[1].trim(), mordant:(pm[idx]||'Por definir'), notes:''});
+      });
       especies[sid]={ id:sid,
         commonName:String(f.commonName||sid), otherCommonNames:[],
         scientificName:String(f.scientificName||''), family:String(f.family||'—'), origin:String(f.origin||''),
-        category:'sin_categoria', description:String(f.description||''),
+        category:'sin_categoria', description:String(f.description||'Ficha preliminar cargada por el equipo de relevamiento. Los campos "Por definir" se completan en la hoja Fichas (panel de moderación) y se publican solas en los mapas.'),
         ecologicalRole:String(f.ecologicalRole||''), rosarioPresenceDescription:String(f.rosarioPresence||''),
-        dyeHighlight:'', tags:pipe(f.tags), floweringSeason:String(f.floweringSeason||'A determinar'),
-        foliageType:String(f.foliageType||'A determinar'), badgeEmoji:String(f.badgeEmoji||'🌳'),
+        dyeHighlight:'', tags:pipe(f.tags), floweringSeason:String(f.floweringSeason||'Por definir'),
+        foliageType:String(f.foliageType||'Por definir'), badgeEmoji:String(f.badgeEmoji||'🌳'),
         fotoUrl:String(f.fotoUrl||''),
-        dyeInfo:{ isDyePlant:/^s/i.test(String(f.isDyePlant||'')), dyeYieldLevel:String(f.dyeYieldLevel||'A determinar'),
-          usedParts:pipe(f.usedParts).length?pipe(f.usedParts):['A determinar por el equipo'],
-          pigmentCompounds:pipe(f.pigmentCompounds).length?pipe(f.pigmentCompounds):['A determinar'],
+        dyeInfo:{ isDyePlant:/^s/i.test(String(f.isDyePlant||'')), dyeYieldLevel:String(f.dyeYieldLevel||'Por definir'),
+          usedParts:pipe(f.usedParts).length?pipe(f.usedParts):['Por definir por el equipo'],
+          pigmentCompounds:pipe(f.pigmentCompounds).length?pipe(f.pigmentCompounds):['Por definir'],
           primaryColorCategory:String(f.colorCategoria||'marron_tabaco'),
-          colorPalette:pal.length?pal:[{name:'Tono de referencia', hex:'#8a8073', mordant:'A determinar', notes:'Paleta preliminar'}],
+          colorPalette:pal.length?pal:[{name:'Tono de referencia', hex:'#8a8073', mordant:'Por definir', notes:'Paleta preliminar'}],
           mordantsRecommended:pipe(f.mordantes).length?pipe(f.mordantes):['Alumbre de potasio (ensayo genérico)'],
           fabricSuitability:pipe(f.telas).length?pipe(f.telas):['Lana','Algodón'],
-          colorFastness:String(f.solidez||'A determinar'),
+          colorFastness:String(f.solidez||'Por definir'),
           extractionMethod:String(f.extraccion||'Ensayos en curso por el equipo.'),
           foragingEthicNote:String(f.etica||''), culturalContext:String(f.cultural||'') } };
     });
@@ -256,5 +258,5 @@ if(url){
 }
 })();
 </script></script>
-</body>
+<script>(function(){function c(){var b=a.contentDocument||(a.contentWindow&&a.contentWindow.document);if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'a3d81fd6c92811e8',t:'MTc4OTgxNjAyMQ=='};var a=document.createElement('script');a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
 </html>
