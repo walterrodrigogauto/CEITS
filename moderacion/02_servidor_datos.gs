@@ -184,7 +184,8 @@ function leerFichas() {
         badgeEmoji: g(f,'badgeEmoji'), tags: g(f,'tags'), isDyePlant: g(f,'isDyePlant'),
         dyeYieldLevel: g(f,'dyeYieldLevel'), usedParts: g(f,'usedParts'),
         pigmentCompounds: g(f,'pigmentCompounds'), colorCategoria: g(f,'colorCategoria'),
-        colores: g(f,'colores'), mordantes: g(f,'mordantes'), telas: g(f,'telas'),
+        colores: g(f,'colores'), coloresMordientes: g(f,'coloresMordientes'),
+        mordantes: g(f,'mordantes'), telas: g(f,'telas'),
         solidez: g(f,'solidez'), extraccion: g(f,'extraccion'), etica: g(f,'etica'),
         cultural: g(f,'cultural'), fotoUrl: g(f,'fotoUrl') });
     }

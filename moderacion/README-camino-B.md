@@ -116,7 +116,11 @@ Los registros de especies que no están en la base publican una **ficha provisio
 
 1. **Una sola vez**: hoja de Google → Archivo → Importar → subir `fichas-plantilla.csv` → **"Insertar hoja nueva"** → renombrarla exactamente **`Fichas`**. (Trae una fila de ejemplo: Ginkgo Biloba, edítala o bórrala.)
 2. **Una fila por especie nueva**, con `id` = el que aparece como especie en el registro (ej: `ginkgo_biloba`; la lista de ids que faltan se ve en el panel → Publicados, o en el mapa tocando la ficha provisional).
-3. Reglas de formato: listas separadas por `|` (ej: `Lana|Seda`) · colores como `Nombre=#hex` separados por `;` (ej: `Amarillo miel=#E5C468;Ocre=#B8912F`) · `isDyePlant`: `sí`/`no` · `fotoUrl`: link de imagen (Drive compartido o Wikimedia) = **imagen de referencia** que se muestra en la ficha (móvil).
+3. Reglas de formato: listas separadas por `|` (ej: `Lana|Seda`) · colores como `Nombre=#hex` separados por `;` (ej: `Amarillo miel=#E5C468;Ocre=#B8912F`) · **`coloresMordientes`**: la lista de mordientes en el MISMO orden que los colores, separada por `;` (ej: `Alumbre de potasio (15%);Sin mordiente`). Esa es la **correspondencia mordiente↔color** que se muestra en cada tarjeta de color de la ficha y usa el simulador · `isDyePlant`: `sí`/`no` · `fotoUrl`: link de imagen (Drive compartido o Wikimedia) = **imagen de referencia** de la ficha (móvil).
+   - Los valores pendientes se dejan vacíos o con `Por definir`: la ficha muestra "Por definir" y explica cómo completarla. Los campos se llenan a medida que avance la investigación del equipo y se publican solos.
 4. **Publicar**: no hay que tocar nada más — la próxima apertura de los mapas trae las fichas actualizadas (en escritorio se recarga solo una vez).
 
 La hoja solo afecta especies **nuevas**: las 24 fichas curadas de la base jamás se pisan desde acá.
+
+
+**Notas del simulador:** el simulador lista solo las especies **tintóreas** (es un simulador de tinte): una especie nueva aparece cuando su ficha dice `isDyePlant = sí`. La lista se actualiza sola al recargar el mapa.
