@@ -94,6 +94,7 @@ Error generating stack: `+o.message+`
             <p class="text-[11px] text-stone-500 leading-snug">
               ${Ae.addressOrZone}
             </p>
+            ${Ae.foto?`<img src="${Ae.foto}" alt="" loading="lazy" onclick="window.__floraFotoFull&&window.__floraFotoFull(this.src)" style="width:100%;border-radius:10px;margin:2px 0;cursor:zoom-in;display:block"/>`:''}
 
             ${Re?`
               \x3C!-- Dye Details -->
@@ -230,10 +231,22 @@ function aplicar(lote){
         parkName:String(t.parkName||'Otro lugar'), lat:Number(t.lat), lng:Number(t.lng),
         addressOrZone:String(t.addressOrZone||''), specimenCount:Number(t.specimenCount)||1,
         specimenType:String(t.specimenType||'Ejemplar único'), estimatedAgeYears:String(t.estimatedAgeYears||''),
-        curiosityFact:String(t.curiosityFact||'') };
+        curiosityFact:String(t.curiosityFact||''), foto:String(t.foto||'') };
     });
   }catch(e){ console.warn('[Flora] inyección comunitaria:', e); }
 }
+function fotoFull(src){
+  var ov=document.createElement('div');
+  ov.style.cssText='position:fixed;inset:0;background:rgba(22,17,10,.93);z-index:999999;display:flex;align-items:center;justify-content:center;padding:20px;cursor:zoom-out';
+  var img=document.createElement('img');
+  img.src=String(src).replace(/sz=w\d+/,'sz=w1600');
+  img.style.cssText='max-width:100%;max-height:90vh;border-radius:12px;box-shadow:0 10px 50px rgba(0,0,0,.55)';
+  img.onerror=function(){ this.onerror=null; img.src=src; };
+  ov.appendChild(img);
+  ov.onclick=function(){ ov.remove(); };
+  document.body.appendChild(ov);
+}
+window.__floraFotoFull = fotoFull;
 function leer(){ try{ return JSON.parse(localStorage.getItem(CACHE)||'null'); }catch(e){ return null; } }
 var c=leer(); if(c) aplicar(c);
 var url=window.FUENTE_COMUNITARIA;
@@ -258,5 +271,5 @@ if(url){
 }
 })();
 </script></script>
-<script>(function(){function c(){var b=a.contentDocument||(a.contentWindow&&a.contentWindow.document);if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'a3d81fd6c92811e8',t:'MTc4OTgxNjAyMQ=='};var a=document.createElement('script');a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
+</body>
 </html>
