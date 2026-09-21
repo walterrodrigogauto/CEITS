@@ -367,8 +367,13 @@ function abrirSheet(html){
   sheet.classList.add('abierto'); backdrop.classList.add('abierto');
   sheetCont.scrollTop = 0;
 }
+try{ history.pushState({sheet:1}, ''); }catch(e){}
 function cerrarSheet(){ sheet.classList.remove('abierto'); backdrop.classList.remove('abierto'); }
 backdrop.addEventListener('click', cerrarSheet);
+/* botón atrás del dispositivo: primero cierra la ficha abierta; si no hay, recién sale */
+window.addEventListener('popstate', function(){
+  if(sheet.classList.contains('abierto')) cerrarSheet();
+});
 (function(){ // swipe down para cerrar
   var y0=null, dy=0, grab=$('#sheetGrab');
   function start(e){ y0 = e.touches? e.touches[0].clientY : e.clientY; dy=0; }
@@ -1001,5 +1006,5 @@ initMapa();
 cargarComunitarios();
 })();
 </script>
-<script>(function(){function c(){var b=a.contentDocument||(a.contentWindow&&a.contentWindow.document);if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'a3e0be1bec37d841',t:'MTc4OTkwNjM5MA=='};var a=document.createElement('script');a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
+</body>
 </html>
