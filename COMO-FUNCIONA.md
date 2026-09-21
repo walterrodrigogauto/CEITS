@@ -108,14 +108,22 @@ Columnas de la hoja: `id, _fecha, relevador, speciesId, _speciesName, parkId, pa
 
 **Abrir el panel**: `https://…/exec?accion=panel` (el link llega en el email). Se desbloquea con el **PIN de moderación** — el mismo PIN vale, o ser editor de la hoja. La sesión queda abierta en el navegador.
 
-**Decidir cada envío** — el panel muestra foto, ubicación con link a OpenStreetMap, y distintivos (tintórea / cantidad):
+El panel tiene **dos pestañas** y confirmación visual inmediata de cada acción (sin recargar la página):
 
-| Acción | Qué hace en la hoja | Efecto |
+**⏳ Pendientes** — foto, ubicación con link a OpenStreetMap y distintivos (tintórea / cantidad). Acciones:
+
+| Acción | Qué hace | Efecto |
 |---|---|---|
 | ✅ **Aprobar** | `estado = aprobado` | Aparece en los mapas (paso 5) |
-| ❌ **Rechazar** | `estado = rechazado` + motivo (lo pide con un cuadro de texto) | Nunca se publica; el motivo queda registrado |
-| ✏️ **Corregir coordenadas** | editar celdas `lat`/`lng` directamente en la hoja | La próxima lectura del servidor usa la corregida |
-| 🗑️ **Dar de baja** | cambiar `estado` a `rechazado` en la hoja | Desaparece del mapa al instante |
+| ❌ **Rechazar** | abre un campo de motivo integrado → `estado = rechazado` | Nunca se publica; el motivo queda registrado |
+
+**🌍 Publicados** — lista todo lo visible: comunitarios aprobados + base central importada. Cada uno con botón **🗑️ Dar de baja** que lo quita del mapa al instante (los comunitarios pasan a `rechazado`; la base se marca `baja` en la hoja "Base" y viaja a los mapas como `_bajas`). Reactivar uno de la base: hoja "Base" → `estado = aprobado`.
+
+✏️ Corregir coordenadas: editar celdas `lat`/`lng` en la hoja (la próxima lectura del servidor usa la corregida).
+
+**Completar fichas de especies nuevas** (hoja "Fichas"): los registros de especies fuera de la base publican una ficha provisional a prueba de todo (nada se rompe, marcador y simulador incluidos). Para completarla con datos reales y **imagen de referencia**: importar `fichas-plantilla.csv` como hoja `Fichas` y llenar una fila por especie (listas con `|`, colores `Nombre=#hex;…`, foto con link) — viaja sola a los mapas. Detalle en `moderacion/README-camino-B.md`.
+
+**Importación única de la base (2 min, para poder dar de baja ejemplares centrales):** abrir la hoja de Google → Archivo → Importar → subir `moderacion/base-para-importar.csv` → "Insertar hoja nueva" → nombrarla **`Base`**. Queda una copia editable de los 93 ejemplares (id, especie, parque, coords, estado).
 
 Queda auditoría de todo: quién moderó (`moderador`) y cuándo (`fechaModeracion`).
 
@@ -136,9 +144,7 @@ Con la URL pegada (y un commit para publicarla), cada vez que alguien abre el ma
 1. El mapa pide los aprobados al servidor (`fetch`; si el navegador lo bloquea, usa JSONP como plan B).
 2. Los integra a la base central **sin duplicar** (control por `id`) y **sin mostrar nada fuera de Rosario** (filtro por área).
 3. Lo guarda en **caché del navegador**: si después se abre el mapa sin conexión, se ve lo último conocido.
-4. En pantalla, los aportes se distinguen de la base central:
-   - 📱 **Móvil**: chip `🌱 Registro comunitario` en la lista/buscador/mapa; badge `🌱 Aporte comunitario · <relevador>`; al tocar se abre su ficha (completa si la especie ya tiene ficha; básica "en construcción" si es una especie nueva).
-   - 🖥️ **Escritorio**: punto verde sobre el mapa con popup (foto, nombre, tintórea, link OSM, badge); insignia fija abajo a la izquierda con el estado de la conexión.
+4. Los ejemplares aprobados se integran **idénticos al resto**: en móvil se agregan al mapa y a las listas como cualquier ejemplar (con su foto en la ficha cuando el registro la trae), y en escritorio se **inyectan en los datos de la app antes de que arranque**, así los dibuja el mismo código: mismos marcadores con brillo, mismas fichas, mismos filtros — y tanto el **popup del mapa como la ficha-panel** muestran **la foto del relevamiento** (o la imagen de referencia de la hoja Fichas si el registro no trae). La ficha-panel de escritorio tiene además el botón **🔎 Ver información completa**: abre la ficha extendida con la paleta de colores y su mordiente correspondiente por tarjeta, partes, pigmentos, mordientes, fibras, receta, ética y contexto cultural — la misma información que la ficha de la versión móvil. En **ambas versiones**, tocar cualquier foto la abre a **pantalla completa** (overlay con la imagen en alta: `sz=w1600` de Drive). En escritorio, cuando hay novedades, la página se recarga **una sola vez** sola. Si el servidor informa bajas (`_bajas`), los mapas **ocultan solos** esos ejemplares, aunque estén en la base central.
 
 **⏱️ Tiempo real sin tocar GitHub**: el moderador aprueba → el servidor ya lo publica → el próximo visitante lo ve. No hay que "actualizar la página" ni redesplegar nada. La caché del navegador es por-visita (cada apertura reconsulta).
 
@@ -186,4 +192,18 @@ Detalle paso a paso en `moderacion/README-camino-B.md` y `moderacion/guia-sketch
 - **¿Se puede testear el servidor?** `…/exec?accion=ping` responde si está vivo.
 - **¿Y si dos personas relevan lo mismo?** Son registros distintos (ids únicos); el moderador aprueba uno y rechaza el otro indicando el motivo.
 - **El relevador en el teléfono se ve en blanco** → en el WebView falta *JavaScript ON*. **Los registros se borran al cerrar** → falta *DOM Storage ON*. **La cámara no abre** → falta *File Upload ON* (todo en `moderacion/guia-sketchware.md`).
-- **¿Actualicé la hoja y no se ve?** Revisá que `estado` sea exactamente `aprobado`, y que el mapa esté configurado con la URL `/exec` (insignia 🌱 en pantalla = cargador activo).
+- **¿Actualicé la hoja y no se ve?** Revisá que `estado` sea exactamente `aprobado`, y que el mapa esté configurado con la URL `/exec` (la línea 📡 de la Guía (móvil) muestra el estado de sincronización).
+
+---
+
+## 11 · El botón atrás del teléfono: cierra de a una, el mapa queda al final
+
+En las tres apps el botón **atrás** de Android no sale de golpe: va cerrando las capas abiertas **una por una**, y recién cuando no queda ninguna vuelve hacia atrás como siempre (última pantalla = el mapa).
+
+| App | Qué cierra cada "atrás" |
+|---|---|
+| **Móvil** | Si hay una ficha de ejemplar abierta → la cierra. Si no → vuelve (mapa). |
+| **Relevador** | Si estás en "Mis registros" o "Mis datos" → vuelve a "Nuevo registro". Si ya estás ahí → vuelve (salir de la app). |
+| **Escritorio** (también en teléfono) | Cierra en orden: foto a pantalla completa → ficha completa (🔎) → simulador → ficha del ejemplar → mapa. |
+
+Notas técnicas (por si se toca el código): el escritorio detecta cada capa con un `MutationObserver` y la registra con `history.pushState`; el botón atrás dispara `popstate` y se cierra **una sola capa**. En el relevador y el móvil lo mismo, con las vistas/ficha correspondientes. En un WebView de Sketchware el botón atrás solo llega si la app llama a `goBack()` del WebView (ver `moderacion/guia-sketchware.md`).
