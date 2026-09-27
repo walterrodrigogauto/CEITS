@@ -159,6 +159,8 @@ Con la URL pegada (y un commit para publicarla), cada vez que alguien abre el ma
 | Cómo se actualiza | Editando el archivo y haciendo **commit** → GitHub Pages redespliega (~1 min) | Panel del moderador → **aparece solo** |
 | Control | Curaduría total del coordinador | Moderación obligatoria antes de publicar |
 
+📷 **Columna `fotoUrl` de la hoja Fichas**: es la **foto de referencia de la especie**. Va una URL que empiece por `https://` (o `data:image/`). En **móvil y escritorio** esa foto tiene prioridad sobre la embebida y aparece en las fichas que no traen foto propia. Si la celda tiene un texto que no es URL, **se ignora** (no rompe nada). La editás en la hoja y sale solo, sin tocar código.
+
 ---
 
 ## 8 · Credenciales: quién sabe qué
@@ -202,8 +204,8 @@ En las tres apps el botón **atrás** de Android no sale de golpe: va cerrando l
 
 | App | Qué cierra cada "atrás" |
 |---|---|
-| **Móvil** | Si hay una ficha de ejemplar abierta → la cierra. Si no → vuelve (mapa). |
+| **Móvil** | Cierra en orden: foto a pantalla completa → ficha del ejemplar → mapa. |
 | **Relevador** | Si estás en "Mis registros" o "Mis datos" → vuelve a "Nuevo registro". Si ya estás ahí → vuelve (salir de la app). |
 | **Escritorio** (también en teléfono) | Cierra en orden: foto a pantalla completa → ficha completa (🔎) → simulador → ficha del ejemplar → mapa. |
 
-Notas técnicas (por si se toca el código): el escritorio detecta cada capa con un `MutationObserver` y la registra con `history.pushState`; el botón atrás dispara `popstate` y se cierra **una sola capa**. En el relevador y el móvil lo mismo, con las vistas/ficha correspondientes. En un WebView de Sketchware el botón atrás solo llega si la app llama a `goBack()` del WebView (ver `moderacion/guia-sketchware.md`).
+Notas técnicas (por si se toca el código): en el móvil, cada capa se registra con `history.pushState` al abrirse y el botón atrás cierra la **última** capa; en el escritorio las detecta un `MutationObserver`; en el relevador se registran las pestañas. Si la app corre en un WebView de Sketchware, el botón atrás solo llega si la app llama a `goBack()` del WebView (ver `moderacion/guia-sketchware.md`).
