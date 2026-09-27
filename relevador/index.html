@@ -1,11 +1,12 @@
-<!doctype html>
+<!DOCTYPE html>
+
 <html lang="es">
 <head>
-<meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
-<meta name="theme-color" content="#3d2b1e" />
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0, viewport-fit=cover" name="viewport"/>
+<meta content="#214f42" name="theme-color"/>
 <title>Flora Campo · Registro de ejemplares</title>
-<meta name="description" content="App de relevamiento de flora urbana: GPS, foto y ficha por ejemplar. Exporta en el formato del mapa Flora Rosario." />
+<meta content="App de relevamiento de flora urbana: GPS, foto y ficha por ejemplar. Exporta en el formato del mapa Flora Rosario." name="description"/>
 <style>
 /* required styles */
 
@@ -748,151 +749,179 @@ svg.leaflet-image-layer.leaflet-interactive path {
   .nota-seg{background:#efe9db;border-radius:11px;padding:9px 11px;font-size:11px;color:#6b6152;line-height:1.45;margin-top:12px;}
   .mini-ayuda{font-size:11px;color:var(--gris);margin-top:4px;line-height:1.4;}
 </style>
-</head>
+<style id="flora-ui-redesign">/* Flora Campo · capa de presentación, sin dependencias externas */
+:root{--marron:#214f42;--marron2:#326554;--crema:#f5f6f1;--papel:#fff;--tinta:#253c33;--gris:#64736b;--linea:#dce3d9;--verde:#285d49;--tinte:#98723c;--rad:18px;--sombra:0 5px 24px #243e3010}
+body{background:#e9eee7;font-family:Inter,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;line-height:1.5}
+button,input,select,textarea{font-family:inherit}button{transition:background .18s,box-shadow .18s,transform .18s}button:hover{filter:brightness(.96)}button:active{transform:translateY(1px)}button:focus-visible,a:focus-visible,[role=button]:focus-visible{outline:3px solid #ab8548;outline-offset:3px}input:focus,select:focus,textarea:focus{outline:0;border-color:#508367!important;box-shadow:0 0 0 3px #50836720}input,select{min-width:0}input::placeholder,textarea::placeholder{color:#879188}button:disabled{opacity:.55;cursor:wait}.ui-icon{width:23px;height:23px;flex-shrink:0;vertical-align:middle}
+#app{max-width:1120px;position:relative;box-shadow:0 0 60px #25442b0c;background:var(--crema)}
+header{background:#fff;color:var(--tinta);padding:calc(env(safe-area-inset-top) + 16px) 32px 16px;border-bottom:1px solid var(--linea);gap:12px}header h1{font-size:20px;letter-spacing:-.6px}header h1 small{font-size:11px;letter-spacing:.2px;font-weight:400;color:var(--gris);opacity:1;margin-top:1px}.brand-mark{width:42px;height:42px;border-radius:13px;background:var(--verde);color:#fff;display:grid;place-items:center}.header-location{font-size:10px;letter-spacing:1.5px;color:var(--gris);margin-right:14px}.btn-icono{border-radius:12px;width:40px;height:40px;background:#eef2eb;color:var(--verde)}
+.scroll{padding:32px 42px 40px;scroll-behavior:smooth;scrollbar-width:thin;scrollbar-color:#c3cec2 transparent}.page-heading{margin:0 0 26px}.eyebrow{display:block;font-size:10px;letter-spacing:2px;font-weight:750;color:#627b63}h2{font-family:Georgia,"Times New Roman",serif;font-size:34px;font-weight:400;letter-spacing:-.8px;line-height:1.2;margin:8px 0 10px}.page-heading p,.records-top p{font-size:13px;color:var(--gris);margin:0}.form-guide{display:flex;gap:16px;align-items:center;margin-top:24px;font-size:12px}.form-guide a{color:var(--verde);text-decoration:none;font-weight:600}.form-guide span{color:#b5c4b4}.required-note{font-size:11px;color:var(--gris);margin-top:14px}
+.form-card{padding:25px 28px;background:#fff;border:1px solid var(--linea);border-radius:18px;margin-bottom:20px;box-shadow:var(--sombra);scroll-margin-top:16px}.card-heading{display:flex;gap:13px;margin-bottom:25px;align-items:center}.step-number{display:grid;place-items:center;width:35px;height:35px;border-radius:50%;background:#edf2e8;color:#617c4e;font-size:12px;font-weight:700;flex-shrink:0}.card-heading h3{margin:0;font-size:16px;letter-spacing:-.3px}.card-heading p{margin:3px 0 0;font-size:12px;color:var(--gris)}.campo{margin-bottom:20px}.campo:last-child{margin-bottom:0}.campo label{font-size:12px;letter-spacing:0;text-transform:none;font-weight:650;color:#425b4d;margin-bottom:8px}.campo input[type=text],.campo input[type=number],.campo select,.campo textarea{background:#fafbf8;border:1px solid #dce4d8;border-radius:10px;min-height:46px;font-size:14px;padding:12px 13px}.campo textarea{min-height:100px}.fila2{gap:16px;grid-template-columns:minmax(0,1fr) minmax(0,1fr)}.mini-ayuda{font-size:11.5px;line-height:1.6;margin-top:7px}.toggle{max-width:350px}.toggle button{border-width:1px;font-size:13px;min-height:44px}.toggle button.on-si{background:#eaf3e8;color:#285d49;border-color:#759777;box-shadow:inset 0 0 0 1px #759777}.toggle button.on-no{background:#edf0ec;color:#47574c;border-color:#8a9c88}
+#zonaFoto{display:flex;justify-content:center;align-items:center;gap:18px;min-height:128px;background:#f8faf5;border:1.5px dashed #bfceb5;border-radius:13px}#zonaFoto>.ui-icon{width:32px;height:32px;color:#729067}#zonaFoto .t{text-align:left;font-size:12px;line-height:1.8;margin:0}#zonaFoto strong{font-size:14px;color:var(--verde)}.optional{display:block;color:#85907f;font-size:10px;margin-top:5px}#fotoPrev img{max-height:300px}#btnGPS{background:#eaf0e5;color:#315c40;border:1px solid #cad7c1;padding:12px;font-size:13px}#gpsEstado{font-size:11.5px}#btnGpsLimpiar{background:#eef1ea!important;color:#5f7063}#miniMapa{height:280px;border:1px solid var(--linea);border-radius:12px;margin-top:14px;background:#e8ede4}.aviso{font-size:12px}.btn-principal{font-size:14px;border-radius:11px;padding:15px 20px;font-weight:650;box-shadow:0 3px 8px #285d4912}.btn-sec{border-width:1px;font-size:13px;border-radius:11px;min-height:46px}.nota-seg{display:block;background:#eaf0e5;color:#536a56;border:1px solid #dce6d4;font-size:12px;line-height:1.7;padding:15px 18px;border-radius:12px}.data-card{background:#fff;border:1px solid var(--linea);border-radius:16px;padding:23px;margin-bottom:18px}.data-card>label{font-size:16px;margin-bottom:12px}.danger-card{background:#fffaf8;border-color:#ebd9d2}
+nav{padding:10px 28px calc(10px + env(safe-area-inset-bottom));gap:10px;box-shadow:0 -4px 22px #263d2905}nav button{flex-direction:row;justify-content:center;gap:9px;font-size:12px;padding:12px 8px;border-radius:12px;color:#72816f;min-height:48px}nav button.on{background:#eaf1e4;color:var(--verde)}nav .ui-icon{width:21px;height:21px}.count-pill{background:#dfe9d7;border-radius:6px;padding:1px 6px;font-size:10px}#toast{bottom:100px;border-radius:12px;box-shadow:0 6px 25px #18352c30;pointer-events:none}
+.records-top{padding:28px 42px 12px;background:var(--crema)}.records-top h2{font-size:32px}.records-top input{width:100%;margin-top:20px;background:#fff;border:1px solid var(--linea);border-radius:11px;padding:13px 16px;font-size:14px}#resultadoBusqueda{font-size:11px;margin:8px 0 0;min-height:16px}#listaReg{padding-top:10px}.reg{padding:17px;gap:16px;margin-bottom:13px;box-shadow:var(--sombra)}.reg b{font-size:15px}.reg img,.reg .sin{width:72px;height:82px;background:#eaf0e3}.reg .sub{font-size:12px;line-height:1.6;margin:4px 0}.reg .acciones{margin-top:10px;gap:8px}.reg .acciones button{min-height:36px;padding:7px 12px}.badge{font-size:10px;padding:3px 9px}.badge.t{background:#edf1de;color:#626f32}.vacio{background:#fff;border:1px dashed #c7d4bf;border-radius:18px;margin:12px 0;padding:64px 22px;font-size:14px}.vacio::before{content:'✿';display:block;color:#6d8e5e;font-size:42px;margin-bottom:15px}
+/* Access screen: a botanical cover and a focused login form. */
+#candado{padding:0;flex-direction:row;align-items:stretch;justify-content:stretch;text-align:left;background:#f8f9f4;color:var(--tinta);overflow:auto}#candado .lock-story{width:48%;background:#214f42;color:#f5f4e7;position:relative;display:flex;flex-direction:column;justify-content:space-between;padding:38px;overflow:hidden;flex-shrink:0}.lock-brand{font-size:11px;font-weight:650;letter-spacing:2px;display:flex;align-items:center;gap:12px}.botanical{flex:1;min-height:140px;display:flex;align-items:center;justify-content:center}.botanical svg{width:100%;max-height:440px}.story-copy{position:relative}.story-copy .eyebrow{color:#b7c7a3;font-size:9px}#candado .story-copy h2{font:400 34px/1.2 Georgia,serif;margin:14px 0;letter-spacing:-.5px}#candado .story-copy p{font-size:12px;color:#d0ddcc;opacity:1;max-width:280px;line-height:1.7;margin-bottom:0}.lock-form{width:52%;display:flex;flex-direction:column;align-items:stretch;justify-content:center;padding:55px}.login-emblem{background:#e8efe1;color:#426942;border:1px solid #dae5d3;border-radius:18px;width:58px;height:58px;display:grid;place-items:center;margin-bottom:28px}.login-emblem .ui-icon{width:29px;height:29px}#candado .lock-form h2{font:400 36px/1.2 Georgia,serif;letter-spacing:-.7px;margin:12px 0 18px}#candado .lock-form p{font-size:13px;line-height:1.8;color:var(--gris);opacity:1;max-width:none;margin:0 0 30px}.lock-form label{font-size:12px;font-weight:650}#candado input{margin-top:9px;width:100%;text-align:left;background:#fff;border:1px solid #d8e0d2;border-radius:10px;padding:14px;min-height:50px}#candado #passBtn{width:100%;margin-top:15px;background:var(--verde);border-radius:10px;min-height:50px;font-size:13px;font-weight:600}#candado .err{color:#a43d32;margin-top:8px;font-size:12px;min-height:22px}.access-note{border-top:1px solid var(--linea);padding-top:22px;margin-top:22px;display:flex;gap:12px;color:var(--gris);font-size:10px;line-height:1.8}.access-note .ui-icon{width:17px;height:17px;margin-top:3px}
+@media(min-width:900px){#vista-nuevo .scroll{display:grid;grid-template-columns:1fr 1fr;gap:0 22px;align-content:start;align-items:start}.page-heading{grid-column:1/-1}#paso-01{grid-column:1}#paso-02{grid-column:2;grid-row:2 / span 2}#paso-03{grid-column:1}#btnGuardar,#vista-nuevo .nota-seg{grid-column:1/-1}.form-card{padding:23px}.gps-fila{grid-template-columns:1fr auto}#gpsEstado{grid-column:1/-1;grid-row:2;margin:4px 0}#miniMapa{height:300px}#vista-datos .scroll{max-width:820px;width:100%;margin:auto}}
+@media(max-width:650px){header{padding:calc(env(safe-area-inset-top) + 13px) 18px 13px}header h1{font-size:18px}.header-location{display:none}.scroll{padding:24px 16px 28px}h2{font-size:29px}.form-card{padding:20px 17px;border-radius:15px}.card-heading{gap:10px}.card-heading h3{font-size:15px}.card-heading p{font-size:11px}.form-guide{gap:8px;font-size:10px}.page-heading{margin-bottom:20px}nav{padding:8px 8px calc(8px + env(safe-area-inset-bottom));gap:4px}nav button{flex-direction:column;font-size:10px;gap:4px;position:relative;padding:8px 3px}nav .count-pill{position:absolute;top:5px;left:calc(50% + 14px);font-size:9px}.campo input[type=text],.campo input[type=number],.campo select,.campo textarea{font-size:16px}.records-top{padding:24px 17px 10px}.reg{gap:12px;padding:13px}.reg img,.reg .sin{width:55px;height:65px}#miniMapa{height:245px}.data-card{padding:18px}.gps-fila{gap:6px}#btnGPS{font-size:11px}#gpsEstado{font-size:10px}.lock-form{width:100%;padding:30px 27px;flex:1}#candado{flex-direction:column}#candado .lock-story{width:100%;height:155px;min-height:155px;padding:24px 27px;display:block}.botanical{position:absolute;right:10px;top:-58px;width:190px;height:250px;opacity:.65;pointer-events:none}.story-copy{margin-top:23px}.story-copy .eyebrow,#candado .story-copy p{display:none}#candado .story-copy h2{font-size:22px;line-height:1.15;margin:0}.login-emblem{display:none}#candado .lock-form h2{font-size:31px;margin:8px 0 13px}#candado .lock-form p{margin-bottom:22px;font-size:12px}.access-note{margin-top:12px;padding-top:16px}}
+@media(prefers-reduced-motion:reduce){*,*::before,*::after{scroll-behavior:auto!important;transition:none!important}}
+#toast{opacity:0;visibility:hidden;transition:opacity .2s,transform .2s,visibility .2s}#toast.ver{opacity:1;visibility:visible}
+
+/* Natural y cálido · una bitácora cercana, no un panel corporativo */
+:root{--marron:#49634c;--marron2:#62795b;--crema:#fcf8ef;--papel:#fffdf7;--tinta:#454b39;--gris:#737561;--linea:#e7e5d5;--verde:#59754e;--tinte:#ad704e;--rad:24px;--sombra:0 6px 22px #82764b09}
+body{background:#eee8d9;font-family:"Trebuchet MS",-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif}
+#app{background:var(--crema);box-shadow:0 0 60px #88785412}
+header{background:#fffdf6;border-color:#eae6d6}.brand-mark{background:#dce8c8;color:#526a42;border-radius:17px 13px 18px 12px;transform:rotate(-5deg)}header h1{letter-spacing:-.6px}.header-location{font-size:11px;letter-spacing:.2px;background:#f5ecd9;border-radius:20px;padding:6px 12px;color:#7c7357}.btn-icono{background:#f3eddf;color:#7a7356}
+h2,.records-top h2{font-family:"Trebuchet MS",-apple-system,sans-serif;font-size:33px;font-weight:700;letter-spacing:-1.2px;line-height:1.2;color:#4e6245}
+.eyebrow{letter-spacing:.3px;text-transform:none;font-size:12px;font-weight:600;color:#8b775d}.page-heading{position:relative;padding:22px 25px;background:#f1f0dc;border:1px solid #e8e8d1;border-radius:27px 38px 26px 13px;overflow:hidden}.page-heading:after{content:'✿';position:absolute;right:22px;top:2px;font-size:100px;line-height:1;color:#c6d3a9;opacity:.45;transform:rotate(13deg);pointer-events:none}.page-heading>*{position:relative;z-index:1}.page-heading p{max-width:80%;color:#71765e}.form-guide{margin-top:19px;gap:10px;flex-wrap:wrap}.form-guide a{background:#fffdf4;padding:6px 11px;border-radius:20px;color:#66734d;font-weight:500;font-size:11px}.form-guide span{display:none}.required-note{color:#7c7b65;font-size:10px}
+.form-card{border-radius:25px;background:#fffdf7;border-color:#e8e3d2;padding:25px;box-shadow:0 5px 15px #8d7c4907}.card-heading{padding-bottom:17px;border-bottom:1px dashed #e4e3cf;margin-bottom:21px}.step-number{background:#e6edcf;color:#718348;border-radius:13px 17px 14px 18px;transform:rotate(-5deg);width:38px;height:38px;font-size:13px}#paso-02 .step-number{background:#f7dfc9;color:#9a6947;transform:rotate(5deg)}#paso-03 .step-number{background:#eee5f1;color:#8b7092;transform:rotate(-3deg)}.card-heading h3{font-size:17px;font-weight:650;color:#566747}.card-heading p{color:#85836e}.campo label{color:#686b52;font-weight:600}.campo input[type=text],.campo input[type=number],.campo select,.campo textarea{background:#fbfaf2;border-color:#e5e3d2;border-radius:14px;color:#525a43}.toggle button{border-radius:18px;background:#fbfaf1;color:#84876b}.toggle button.on-si{background:#e7edce;color:#657744;border-color:#a7b77e;box-shadow:none}.toggle button.on-no{background:#f5e9d9;border-color:#cbbb9f;color:#857251}input::placeholder,textarea::placeholder{color:#989984}
+#zonaFoto{border-radius:21px 15px 23px 17px;background:#f7f3e6;border-color:#d7ca9e;min-height:135px}#zonaFoto .ui-icon{color:#a38c5b}#zonaFoto strong{color:#81714d}#zonaFoto .t{color:#8b8067}.optional{color:#908c74}#fotoPrev img{border-radius:22px}#btnGPS{border-radius:16px;background:#f5e1cf;border-color:#ecd1b9;color:#9b674a;font-weight:600}#btnGpsLimpiar{background:#f2edde!important;color:#8a7a58}#miniMapa{border-radius:22px;border-color:#e3dfce}.btn-principal{border-radius:19px;background:#708951;font-weight:650;box-shadow:0 4px 0 #52683d15;font-size:15px}.btn-sec{border-radius:17px;background:#fffdf7;border-color:#e3decb;color:#7d7256}.nota-seg{background:#f2eddd;border-color:#e9e2cf;color:#81765d;border-radius:17px 23px 19px 13px;font-size:11.5px}.data-card{background:#fffdf7;border-radius:23px;border-color:#e8e0d1}.data-card>label{color:#67764e}.danger-card{background:#fcf1e9;border-color:#eed8c9}.danger-card>label{color:#ab7558}
+nav{background:#fffdf6;border-color:#e9e3d3;box-shadow:0 -4px 20px #95846005}nav button{color:#8d9076;border-radius:19px;font-weight:600}nav button.on{background:#e9edce;color:#647841}.count-pill{background:#dce5bd;color:#637844}#toast{background:#687c50;color:#fffdf2;border-radius:19px}.reg{background:#fffdf7;border-color:#e6e2d1;border-radius:23px}.reg img,.reg .sin{border-radius:17px;background:#edf0d8}.reg .acciones button{border-radius:12px;background:#faf7ec;border-color:#e5dec9;color:#7f7459}.badge.t{background:#f5e2cc;color:#98714a}.badge.nt{background:#edecdf;color:#85806a}.records-top{background:var(--crema)}.records-top input{background:#fffdf7;border-radius:17px;border-color:#e6e0cd}.vacio{background:#faf5e7;border-color:#d9cdab;border-radius:30px}.vacio:before{color:#c39565}
+#candado{background:#fffaf0;color:#555b43}#candado .lock-story{background:#f0e2cb;color:#697147;border-right:1px solid #e7dcc5;padding:40px}.lock-brand{letter-spacing:.3px;font-size:16px;color:#667348}.lock-brand .ui-icon{width:29px;height:29px}.botanical{position:relative}.botanical:before{content:'';position:absolute;width:85%;aspect-ratio:1;background:#e3e6c4;border-radius:47% 53% 60% 40% / 50% 39% 61% 50%;transform:rotate(-12deg)}.botanical svg{position:relative;z-index:1;max-height:400px}.story-copy .eyebrow{color:#948564;font-size:12px}#candado .story-copy h2{font-family:"Trebuchet MS",sans-serif;font-weight:700;color:#68784f;font-size:33px;line-height:1.2;letter-spacing:-1px}#candado .story-copy p{color:#8e8366;font-size:13px;line-height:1.7}.lock-form{padding:52px}.login-emblem{background:#edf0d6;color:#7f915c;border:0;border-radius:21px 27px 20px 29px;transform:rotate(-6deg);width:64px;height:64px;margin-bottom:24px}#candado .lock-form h2{font:700 35px/1.2 "Trebuchet MS",sans-serif;letter-spacing:-1px;color:#63754c}#candado .lock-form p{color:#87816a;font-size:14px;line-height:1.8}.lock-form label{color:#817a62;font-size:13px;font-weight:500}#candado input{border-radius:17px;border-color:#e5dfc9;background:#fffcf5;padding:15px;color:#62704c}#candado #passBtn{background:#81965f;color:#fffef7;border-radius:18px;font-size:15px;min-height:53px;box-shadow:0 4px 0 #60754315}.access-note{border-color:#e8e0cc;color:#95876b;font-size:11px}.lock-form .eyebrow{font-size:12px;color:#a48a62;letter-spacing:.2px}
+@media(max-width:650px){h2,.records-top h2{font-size:28px}.page-heading{padding:20px 18px}.page-heading p{max-width:90%;font-size:12px}.page-heading:after{right:7px;top:10px;font-size:75px;opacity:.3}.form-guide{gap:5px}.form-guide a{font-size:10px;padding:6px 8px}.form-card{padding:21px 17px}.card-heading h3{font-size:16px}.header-location{display:none}#candado .lock-story{padding:24px 27px;height:170px;min-height:170px;border-right:0;border-bottom:1px solid #e4dcc6}#candado .story-copy h2{font-size:24px;max-width:250px}.botanical:before{top:60px;width:160px;height:155px}.botanical{right:-10px;opacity:.8}.lock-form{padding:30px 27px}#candado .lock-form h2{font-size:31px}#candado .lock-form p{font-size:13px}nav button{border-radius:17px}}
+
+/* Flora / color editorial: pigmentos intensos, geometría limpia. */
+:root{--marron:#244f4a;--marron2:#336a60;--crema:#f7f4ec;--papel:#fffdf8;--tinta:#273d39;--gris:#66716c;--linea:#dedfd3;--verde:#276859;--tinte:#ad4c35;--rad:16px}
+body{background:#e2e5d9;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif}header{border-top:4px solid #bd563a;background:#fffdf8;color:#263e38}.brand-mark{background:#276859;color:#e8eab7;border-radius:12px;transform:none}.header-location{background:#eee6cd;color:#766034;border-radius:6px}.btn-icono{background:#e4ebdf;color:#335b4b}
+h2,.records-top h2{font-family:Georgia,"Times New Roman",serif;font-weight:400;letter-spacing:-.7px;font-size:35px;color:#234e43}.eyebrow{font-size:10px;letter-spacing:1.5px;text-transform:uppercase;font-weight:700;color:#536f60}.page-heading{background:#28665a;border:none;border-radius:16px;padding:25px 27px;color:#fff9e7}.page-heading h2{color:#fff9e7}.page-heading .eyebrow{color:#e2cf91}.page-heading p{color:#e0ebe0}.page-heading:after{content:'';width:165px;height:165px;right:-65px;top:-50px;border:28px solid #d6b24e;border-radius:50%;opacity:.85;transform:none}.form-guide a{background:#f1dfaa;color:#344c3f;border-radius:5px;padding:7px 12px;font-weight:600}.form-guide a:nth-of-type(2){background:#edb39b;color:#5c332d}.form-guide a:nth-of-type(3){background:#d2c9e8;color:#47365f}.required-note{color:#d1e1d5}
+.form-card{border-radius:15px;padding:23px;border:1px solid #e0e1d7;border-top:4px solid #276859;background:#fffdf8;box-shadow:0 5px 18px #2c493507}#paso-02{border-top-color:#ba573e}#paso-03{border-top-color:#81709f}.card-heading{border-bottom:1px solid #e7e5da}.card-heading h3{color:#294f43;font-size:16px;font-weight:650}.card-heading p{color:#6e7568}.step-number{background:#28665a;color:#fff9e5;border-radius:7px;transform:none;font-size:12px;font-weight:700}#paso-02 .step-number{background:#ba573e;color:#fff5e5;transform:none;border-radius:7px}#paso-03 .step-number{background:#81709f;color:#fff;transform:none;border-radius:7px}.campo label{color:#40594c}.campo input[type=text],.campo input[type=number],.campo select,.campo textarea{background:#faf9f3;border-color:#dce0d3;border-radius:9px;color:#334b40}input::placeholder,textarea::placeholder{color:#818778}.toggle button{border-radius:8px;background:#faf9f1}.toggle button.on-si{background:#e3edda;color:#345b36;border-color:#719668}.toggle button.on-no{background:#e8e1ef;color:#605070;border-color:#a592b2}
+#zonaFoto{border-radius:12px;background:#f4e5bf;border-color:#b9a16c}#zonaFoto .ui-icon{color:#927131}#zonaFoto strong{color:#6d5524}#zonaFoto .t,.optional{color:#7c6c44}#btnGPS{background:#b65038;color:#fff8ed;border-color:#b65038;border-radius:9px}#btnGpsLimpiar{background:#f0e1d5!important;color:#8a543f}#miniMapa{border-radius:12px}.btn-principal{background:#276859;border-radius:10px;box-shadow:none;font-size:14px}.btn-sec{border-radius:10px;background:#fffdf8;color:#475d4a;border-color:#d9ded0}.nota-seg{border-radius:10px;background:#f0e7cb;border-color:#e6d6ac;color:#766138}.data-card{border-radius:15px;border-left:4px solid #b65038}.data-card:nth-of-type(3){border-left-color:#c49a36}.data-card:nth-of-type(4){border-left-color:#81709f}.data-card>label{color:#405f4e}.danger-card{background:#fbf0e9;border-color:#e8c6b8;border-left-color:#aa5842}
+nav{background:#fffdf8}nav button{border-radius:9px;color:#697569}nav button.on{background:#276859;color:#fff8e6}.count-pill{background:#e0cc88;color:#4e482d}#toast{background:#234f46;border-radius:12px}.reg{border-radius:14px;border-left:3px solid #81709f}.reg img,.reg .sin{border-radius:10px;background:#e4ead3}.reg .acciones button{border-radius:7px}.badge.t{background:#edcf86;color:#655019}.badge.nt{background:#e1d8ef;color:#66527f}.records-top input{border-radius:10px}.vacio{background:#efeadb;border-radius:17px}.vacio:before{content:'↗';font-size:38px;color:#b6583e}
+#candado{background:#faf7ed;color:#30453c}#candado .lock-story{background:#245c50;color:#fff8e5;border-right:0;padding:40px;isolation:isolate}.lock-brand{color:#eee6c7;font-size:12px;letter-spacing:2px}.botanical:before{width:84%;aspect-ratio:1;background:#d4b251;border-radius:50%;transform:none}.botanical:after{content:'';position:absolute;width:110px;height:150px;left:3%;bottom:10%;background:#c47354;border-radius:55px 55px 0 0;transform:rotate(-22deg);z-index:0}.botanical svg{max-height:405px}.story-copy .eyebrow{color:#e0bd6a;font-size:10px;letter-spacing:1.4px}#candado .story-copy h2{font:400 37px/1.13 Georgia,serif;letter-spacing:-.6px;color:#fff6da}#candado .story-copy p{color:#dae5d7;font-size:12px;line-height:1.7}.lock-form{position:relative}.lock-form:before{content:'';position:absolute;top:0;left:0;right:0;height:7px;background:linear-gradient(90deg,#ba573e 0 34%,#d4b251 34% 67%,#9986b3 67%)}.login-emblem{background:#e5ddef;color:#705884;border-radius:12px;transform:none;width:54px;height:54px}.lock-form .eyebrow{color:#987337;letter-spacing:1.4px;font-size:10px}#candado .lock-form h2{font:400 39px/1.15 Georgia,serif;letter-spacing:-.8px;color:#285647}#candado .lock-form p{color:#677061;font-size:13px}.lock-form label{color:#4a5b48;font-weight:600;font-size:12px}#candado input{border-radius:9px;color:#2b4f40;border-color:#d6dbc9;background:#fffdf7}#candado #passBtn{background:#b65038;color:#fffaf1;border-radius:9px;box-shadow:none;font-size:14px}.access-note{color:#747762;border-color:#e0dfce}
+@media(max-width:650px){h2,.records-top h2{font-size:30px}.page-heading{padding:22px 19px}.page-heading:after{width:125px;height:125px;right:-65px;top:-48px;opacity:.65}.form-guide a{font-size:10px;padding:7px 8px}.form-card{padding:21px 17px}.card-heading h3{font-size:15px}#candado .lock-story{padding:24px 27px;border:0;height:180px;min-height:180px}#candado .story-copy h2{font:400 26px/1.12 Georgia,serif;max-width:235px}.botanical{opacity:1;right:-15px}.botanical:before{width:165px;height:165px;top:68px}.botanical:after{display:none}.lock-form:before{height:5px}#candado .lock-form h2{font-size:34px}nav button{border-radius:8px}}
+</style></head>
 <body>
 <div id="app">
-  <div id="candado">
-    <div class="taza">🧶</div>
-    <h2>Flora Campo</h2>
-    <p>Registro privado de ejemplares para el mapa de Flora Urbana &amp; Plantas Tintóreas de Rosario.</p>
-    <input type="password" id="passInput" placeholder="Contraseña" autocomplete="current-password" />
-    <button id="passBtn">Entrar</button>
-    <div class="err" id="passErr"></div>
-  </div>
+<div id="candado"><div class="lock-story"><div class="lock-brand"><svg aria-hidden="true" class="ui-icon" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.7" viewbox="0 0 24 24"><path d="M20 4C10 2 3 7 5 14s13 7 15-10Z"></path><path d="M4 21 15 10"></path></svg> FLORA CAMPO</div><div class="botanical"><svg aria-hidden="true" fill="none" viewbox="0 0 400 470" xmlns="http://www.w3.org/2000/svg"><circle cx="200" cy="225" r="170" stroke="#8c9b67" stroke-opacity=".2"></circle><circle cx="200" cy="225" r="125" stroke="#8c9b67" stroke-opacity=".13"></circle><g stroke="#365e43" stroke-width="2"><path d="M172 442c45-113 20-215 73-372"></path><path d="M210 245C123 253 85 195 90 135c66-2 115 30 120 110Z" fill="#366c4c" fill-opacity=".5"></path><path d="M210 245 107 154M215 207c85 3 128-49 116-106-58 12-99 40-116 106Z" fill="#67744d" fill-opacity=".4"></path><path d="m219 201 93-81M199 332c-88 0-130-42-129-100 68-3 112 31 129 100Z" fill="#a44f37" fill-opacity=".45"></path><path d="m198 331-110-82M197 315c87 9 136-34 140-91-68-2-117 27-140 91Z" fill="#345d47" fill-opacity=".7"></path><path d="m201 311 118-72M234 129c-55-14-72-56-57-95 47 10 64 45 57 95Z" fill="#7e688e" fill-opacity=".4"></path><path d="m234 129-49-82"></path></g><circle cx="96" cy="365" fill="#c58f65" r="4"></circle><circle cx="312" cy="64" fill="#c58f65" r="3"></circle></svg></div><div class="story-copy"><span class="eyebrow">Observar · Registrar · Conocer</span><h2>Afuera hay mucho<br/>por descubrir.</h2><p>Entre veredas y parques, cada planta tiene algo para contarnos.</p></div></div><div class="lock-form"><div class="login-emblem"><svg aria-hidden="true" class="ui-icon" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.7" viewbox="0 0 24 24"><path d="M20 4C10 2 3 7 5 14s13 7 15-10Z"></path><path d="M4 21 15 10"></path></svg></div><span class="eyebrow">Flora urbana · Rosario</span><h2>Volvé al campo.</h2><p>Guardá las plantas que encontrás en tus paseos y ayudanos a conocer la flora de Rosario.</p><label for="passInput">Tu contraseña</label><input aria-label="Contraseña de acceso" autocomplete="current-password" id="passInput" placeholder="Contraseña" type="password"/><button id="passBtn">Entrar al cuaderno →</button><div class="err" id="passErr" role="alert"></div><div class="access-note"><svg aria-hidden="true" class="ui-icon" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.7" viewbox="0 0 24 24"><rect height="11" rx="3" width="14" x="5" y="10"></rect><path d="M8 10V7a4 4 0 0 1 8 0v3M12 14v3"></path></svg><span>Este cuaderno es del equipo de relevamiento.<br/>Usá tu contraseña habitual.</span></div></div></div>
+<header>
+<div class="brand-mark"><svg aria-hidden="true" class="ui-icon" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.7" viewbox="0 0 24 24"><path d="M20 4C10 2 3 7 5 14s13 7 15-10Z"></path><path d="M4 21 15 10"></path></svg></div>
+<h1>Flora Campo<small>Relevamiento de ejemplares · Rosario</small></h1>
+<span class="header-location">Rosario, Argentina</span><button class="btn-icono" id="btnSalir" title="Bloquear"><svg aria-hidden="true" class="ui-icon" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.7" viewbox="0 0 24 24"><rect height="11" rx="3" width="14" x="5" y="10"></rect><path d="M8 10V7a4 4 0 0 1 8 0v3M12 14v3"></path></svg></button>
+</header>
+<main>
+<!-- NUEVO REGISTRO -->
+<section class="vista activa" id="vista-nuevo">
+<div class="scroll"><div class="page-heading"><div class="eyebrow">Tu cuaderno de campo</div><h2>¿Qué encontraste hoy?</h2><p>Una hoja, una flor, un árbol… cada hallazgo tiene su historia.</p><div class="form-guide"><a href="#paso-01">1. Especie y foto</a><span>—</span><a href="#paso-02">2. Ubicación</a><span>—</span><a href="#paso-03">3. Detalles</a></div><div class="required-note">* Campos obligatorios</div></div><div class="form-card" id="paso-01"><div class="card-heading"><span class="step-number">01</span><div><h3>Especie y fotografía</h3><p>Elegí la especie y sumá una foto para reconocerla.</p></div></div><div class="campo">
+<label for="fEspecie">Especie *</label>
+<select id="fEspecie"></select>
+<div class="mini-ayuda" id="ayudaEspecie"></div>
+</div><div class="campo" id="campoOtraEspecie" style="display:none">
+<label for="fOtraEspecie">Nombre de la especie no listada</label>
+<input id="fOtraEspecie" placeholder="Ej: Acacia negra" type="text"/>
+</div><div class="campo">
+<label>¿Es tintórea? *</label>
+<div class="toggle">
+<button id="tSi" type="button">🧶 Sí</button>
+<button id="tNo" type="button">🚫 No</button>
+</div>
+<div class="mini-ayuda" id="ayudaTinte"></div>
+</div><div class="campo">
+<label>Foto del ejemplar</label>
+<div aria-label="Agregar foto del ejemplar" id="zonaFoto" role="button" tabindex="0"><svg aria-hidden="true" class="ui-icon" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.7" viewbox="0 0 24 24"><path d="m8 6 2-3h4l2 3h4v14H4V6Z"></path><circle cx="12" cy="13" r="4"></circle></svg><div class="t"><strong>Agregá una foto</strong><br/>Tomá una foto o elegí de tu galería<span class="optional">Opcional · se comprime automáticamente</span></div></div>
+<div id="fotoPrev"><img alt="foto del ejemplar" id="fotoImg"/><button aria-label="Quitar foto" class="quitar" id="fotoQuitar">✕</button></div>
+<input accept="image/*" capture="environment" id="fotoInput" style="display:none" type="file"/>
+</div></div><div class="form-card" id="paso-02"><div class="card-heading"><span class="step-number">02</span><div><h3>Ubicación del ejemplar</h3><p>Usá el GPS o marcá el punto con un toque.</p></div></div><div class="campo">
+<label for="fLat">Ubicación *</label>
+<div class="gps-fila">
+<button id="btnGPS">📍 Capturar GPS</button>
+<div aria-live="polite" id="gpsEstado">Sin coordenadas todavía.<br/>Parate junto al árbol y capturá.</div>
+<button aria-label="Borrar coordenadas" class="btn-icono" id="btnGpsLimpiar" style="background:#8a8073" title="Borrar">✕</button>
+</div>
+<div class="fila2" style="margin-top:8px">
+<input aria-label="Latitud" id="fLat" inputmode="decimal" placeholder="latitud" type="text"/>
+<input aria-label="Longitud" id="fLng" inputmode="decimal" placeholder="longitud" type="text"/>
+</div>
+<div class="aviso" id="avisoFuera">⚠️ El punto quedó fuera de Rosario. Revisá la coordenada o volvé a capturar.</div>
+<div id="miniMapa"></div>
+<div class="mini-ayuda">Tocá el mapa para mover el punto si el GPS quedó imperfecto.</div>
+</div><div class="campo">
+<label for="fSitio">Parque / sitio</label>
+<select id="fSitio"></select>
+</div><div class="campo" id="campoOtroSitio" style="display:none">
+<label for="fOtroSitio">Nombre del lugar</label>
+<input id="fOtroSitio" placeholder="Ej: Parque España, vereda de calle Mendoza" type="text"/>
+</div><div class="campo">
+<label for="fRef">Referencia / dirección</label>
+<input id="fRef" placeholder="Ej: Bv. Oroño al 1200, cantero central" type="text"/>
+</div></div><div class="form-card" id="paso-03"><div class="card-heading"><span class="step-number">03</span><div><h3>Detalles del ejemplar</h3><p>Estos datos son opcionales y enriquecen el relevamiento.</p></div></div><div class="fila2">
+<div class="campo">
+<label for="fCant">Cantidad</label>
+<input id="fCant" max="999" min="1" type="number" value="1"/>
+</div>
+<div class="campo">
+<label for="fTipo">Tipo</label>
+<select id="fTipo">
+<option>Ejemplar único</option>
+<option>Cantero de Alineación</option>
+<option>Bosquecillo / Rodal</option>
+<option>Ejemplar Monumental</option>
+<option>Veredas de Barrio</option>
+<option>Planta de Paseo</option>
+</select>
+</div>
+</div><div class="campo">
+<label for="fEdad">Edad estimada</label>
+<input id="fEdad" placeholder="Ej: 50 años" type="text"/>
+</div><div class="campo">
+<label for="fNotas">Notas / dato de curiosidad</label>
+<textarea id="fNotas" placeholder="Estado del ejemplar, color que da, si hay material caído disponible…"></textarea>
+</div></div>
 
-  <header>
-    <div style="font-size:22px">🧺</div>
-    <h1>Flora Campo<small>Relevamiento de ejemplares · Rosario</small></h1>
-    <button class="btn-icono" id="btnSalir" title="Bloquear">🔒</button>
-  </header>
 
-  <main>
-    <!-- NUEVO REGISTRO -->
-    <section class="vista activa" id="vista-nuevo">
-      <div class="scroll">
-        <div class="campo">
-          <label>Especie *</label>
-          <select id="fEspecie"></select>
-          <div class="mini-ayuda" id="ayudaEspecie"></div>
-        </div>
-        <div class="campo" id="campoOtraEspecie" style="display:none">
-          <label>Nombre de la especie no listada</label>
-          <input type="text" id="fOtraEspecie" placeholder="Ej: Acacia negra" />
-        </div>
-        <div class="campo">
-          <label>¿Es tintórea? *</label>
-          <div class="toggle">
-            <button type="button" id="tSi">🧶 Sí</button>
-            <button type="button" id="tNo">🚫 No</button>
-          </div>
-          <div class="mini-ayuda" id="ayudaTinte"></div>
-        </div>
-        <div class="campo">
-          <label>Foto del ejemplar</label>
-          <div id="zonaFoto"><div class="e">📷</div><div class="t">Tocar para sacar una foto<br>(o elegir de la galería)</div></div>
-          <div id="fotoPrev"><img id="fotoImg" alt="foto del ejemplar" /><button class="quitar" id="fotoQuitar">✕</button></div>
-          <input type="file" id="fotoInput" accept="image/*" capture="environment" style="display:none" />
-        </div>
-        <div class="campo">
-          <label>Ubicación *</label>
-          <div class="gps-fila">
-            <button id="btnGPS">📍 Capturar GPS</button>
-            <div id="gpsEstado">Sin coordenadas todavía.<br>Parate junto al árbol y capturá.</div>
-            <button class="btn-icono" style="background:#8a8073" id="btnGpsLimpiar" title="Borrar">✕</button>
-          </div>
-          <div class="fila2" style="margin-top:8px">
-            <input type="text" id="fLat" placeholder="latitud" inputmode="decimal" />
-            <input type="text" id="fLng" placeholder="longitud" inputmode="decimal" />
-          </div>
-          <div class="aviso" id="avisoFuera">⚠️ El punto quedó fuera de Rosario. Revisá la coordenada o volvé a capturar.</div>
-          <div id="miniMapa"></div>
-          <div class="mini-ayuda">Tocá el mapa para mover el punto si el GPS quedó imperfecto.</div>
-        </div>
-        <div class="campo">
-          <label>Parque / sitio</label>
-          <select id="fSitio"></select>
-        </div>
-        <div class="campo" id="campoOtroSitio" style="display:none">
-          <label>Nombre del lugar</label>
-          <input type="text" id="fOtroSitio" placeholder="Ej: Parque España, vereda de calle Mendoza" />
-        </div>
-        <div class="campo">
-          <label>Referencia / dirección</label>
-          <input type="text" id="fRef" placeholder="Ej: Bv. Oroño al 1200, cantero central" />
-        </div>
-        <div class="fila2">
-          <div class="campo">
-            <label>Cantidad</label>
-            <input type="number" id="fCant" value="1" min="1" max="999" />
-          </div>
-          <div class="campo">
-            <label>Tipo</label>
-            <select id="fTipo">
-              <option>Ejemplar único</option>
-              <option>Cantero de Alineación</option>
-              <option>Bosquecillo / Rodal</option>
-              <option>Ejemplar Monumental</option>
-              <option>Veredas de Barrio</option>
-              <option>Planta de Paseo</option>
-            </select>
-          </div>
-        </div>
-        <div class="campo">
-          <label>Edad estimada</label>
-          <input type="text" id="fEdad" placeholder="Ej: 50 años" />
-        </div>
-        <div class="campo">
-          <label>Notas / dato de curiosidad</label>
-          <textarea id="fNotas" placeholder="Estado del ejemplar, color que da, si hay material caído disponible…"></textarea>
-        </div>
-        <button class="btn-principal" id="btnGuardar">💾 Guardar registro</button>
-        <div class="nota-seg">🔒 Los registros se guardan <b>solo en este dispositivo</b> (funciona sin internet). Usá la pestaña <b>Registros → Exportar</b> para sacarlos de acá y actualizar el mapa.</div>
-      </div>
-    </section>
 
-    <!-- REGISTROS -->
-    <section class="vista" id="vista-registros">
-      <div class="scroll" id="listaReg"></div>
-    </section>
 
-    <!-- DATOS -->
-    <section class="vista" id="vista-datos">
-      <div class="scroll">
-        <div class="campo">
-          <label>Enviar al servidor (con señal)</label>
-          <input type="text" id="fcNombre" placeholder="Tu nombre o email — firma cada registro" />
-          <button class="btn-principal" id="btnEnviarServidor" style="background:var(--tinte)">🚀 Enviar registros nuevos al moderador</button>
-          <div class="mini-ayuda" id="fcEnvioEstado">Los registros viajan al servidor y, aprobados por la moderación, aparecen solos en el mapa. Sin señal: usá el .json de abajo.</div>
-        </div>
-        <div class="campo">
-          <label>Exportar</label>
-          <button class="btn-principal" id="btnExpJson" style="background:var(--tinte)">📤 Exportar lote (.json) para el mapa</button>
-          <button class="btn-sec" id="btnExpCsv">📊 Exportar planilla (.csv) para Excel / Sheets</button>
-          <div class="mini-ayuda">El .json es el que se manda para actualizar la página y la app móvil. El .csv lleva los datos sin fotos, para Excel o Google Sheets.</div>
-        </div>
-        <div class="campo">
-          <label>Respaldo</label>
-          <button class="btn-sec" id="btnBackup">🗄️ Descargar respaldo completo (con fotos)</button>
-          <button class="btn-sec" id="btnRestaurar">♻️ Restaurar respaldo</button>
-          <input type="file" id="restoreInput" accept=".json" style="display:none" />
-        </div>
-        <div class="campo">
-          <label>Zona de peligro</label>
-          <button class="btn-sec" id="btnBorrarTodo" style="color:#a33;border-color:#e4c8c0">🗑️ Borrar TODOS los registros de este dispositivo</button>
-        </div>
-        <div class="nota-seg">
-          <b>Candado de esta app:</b> la contraseña protege el uso en el dispositivo (quien la sepa puede cargar y exportar). Los registros salen del teléfono con el botón 'Enviar al servidor' (con señal) o con el .json (sin señal); siempre pasan por moderación antes de aparecer en el mapa.
-        </div>
-      </div>
-    </section>
-  </main>
 
-  <nav id="nav">
-    <button data-v="nuevo" class="on"><span class="i">➕</span>Nuevo</button>
-    <button data-v="registros"><span class="i">📋</span>Registros (<span id="cuentaReg">0</span>)</button>
-    <button data-v="datos"><span class="i">📤</span>Exportar</button>
-  </nav>
-  <div id="toast"></div>
+
+
+
+
+
+
+<button class="btn-principal" id="btnGuardar">💾 Guardar registro</button>
+<div class="nota-seg">Tus registros se guardan <b>en este dispositivo</b>. Para conservar una copia o compartirlos, entrá en <b>Exportar y respaldar</b>. El mapa base necesita conexión.</div>
+</div>
+</section>
+<!-- REGISTROS -->
+<section class="vista" id="vista-registros"><div class="records-top"><div class="eyebrow">Tus paseos, tus hallazgos</div><h2>Mis registros</h2><p>Los hallazgos que guardaste en este dispositivo.</p><input aria-label="Buscar registros" id="buscarReg" placeholder="Buscar por especie, sitio o dirección…" type="search"/><p id="resultadoBusqueda" role="status"></p></div>
+<div class="scroll" id="listaReg"></div>
+</section>
+<!-- DATOS -->
+<section class="vista" id="vista-datos">
+<div class="scroll"><div class="page-heading"><div class="eyebrow">Del campo al mapa</div><h2>Compartí tus hallazgos.</h2><p>Enviá, exportá y mantené una copia de tus registros.</p></div>
+<div class="campo data-card">
+<label for="fcNombre">Enviar al servidor (con señal)</label>
+<input id="fcNombre" placeholder="Tu nombre o email — firma cada registro" type="text"/>
+<button class="btn-principal" id="btnEnviarServidor" style="background:var(--tinte)">🚀 Enviar registros nuevos al moderador</button>
+<div class="mini-ayuda" id="fcEnvioEstado">Los registros viajan al servidor y, aprobados por la moderación, aparecen solos en el mapa. Sin señal: usá el .json de abajo.</div>
+</div>
+<div class="campo data-card">
+<label>Exportar</label>
+<button class="btn-principal" id="btnExpJson" style="background:var(--tinte)">📤 Exportar lote (.json) para el mapa</button>
+<button class="btn-sec" id="btnExpCsv">📊 Exportar planilla (.csv) para Excel / Sheets</button>
+<div class="mini-ayuda">El .json es el que se manda para actualizar la página y la app móvil. El .csv lleva los datos sin fotos, para Excel o Google Sheets.</div>
+</div>
+<div class="campo data-card">
+<label>Respaldo</label>
+<button class="btn-sec" id="btnBackup">🗄️ Descargar respaldo completo (con fotos)</button>
+<button class="btn-sec" id="btnRestaurar">♻️ Restaurar respaldo</button>
+<input accept=".json" id="restoreInput" style="display:none" type="file"/>
+</div>
+<div class="campo data-card danger-card">
+<label>Zona de peligro</label>
+<button class="btn-sec" id="btnBorrarTodo" style="color:#a33;border-color:#e4c8c0">🗑️ Borrar TODOS los registros de este dispositivo</button>
+</div>
+<div class="nota-seg">
+<b>Candado de esta app:</b> la contraseña protege el uso en el dispositivo (quien la sepa puede cargar y exportar). Los registros salen del teléfono con el botón 'Enviar al servidor' (con señal) o con el .json (sin señal); siempre pasan por moderación antes de aparecer en el mapa.
+        </div>
+</div>
+</section>
+</main>
+<nav aria-label="Navegación principal" id="nav">
+<button class="on" data-v="nuevo"><svg aria-hidden="true" class="ui-icon" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.7" viewbox="0 0 24 24"><path d="M12 5v14M5 12h14"></path></svg><span class="nav-label">Nuevo registro</span></button>
+<button data-v="registros"><svg aria-hidden="true" class="ui-icon" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.7" viewbox="0 0 24 24"><rect height="17" rx="2" width="14" x="5" y="4"></rect><path d="M9 9h6M9 13h6M9 17h4"></path></svg><span class="nav-label">Mis registros</span><span class="count-pill" id="cuentaReg">0</span></button>
+<button data-v="datos"><svg aria-hidden="true" class="ui-icon" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.7" viewbox="0 0 24 24"><path d="M12 16V3m-4 4 4-4 4 4M4 14v6h16v-6"></path></svg><span class="nav-label">Exportar y respaldar</span></button>
+</nav>
+<div aria-live="polite" id="toast" role="status"></div>
 </div>
 <script>
 /* @preserve
@@ -911,7 +940,6 @@ iconRetinaUrl:"data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAADIAAABSCAMAAAAhFXf
 shadowUrl:"data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACkAAAApCAQAAAACach9AAACMUlEQVR4Ae3ShY7jQBAE0Aoz/f9/HTMzhg1zrdKUrJbdx+Kd2nD8VNudfsL/Th///dyQN2TH6f3y/BGpC379rV+S+qqetBOxImNQXL8JCAr2V4iMQXHGNJxeCfZXhSRBcQMfvkOWUdtfzlLgAENmZDcmo2TVmt8OSM2eXxBp3DjHSMFutqS7SbmemzBiR+xpKCNUIRkdkkYxhAkyGoBvyQFEJEefwSmmvBfJuJ6aKqKWnAkvGZOaZXTUgFqYULWNSHUckZuR1HIIimUExutRxwzOLROIG4vKmCKQt364mIlhSyzAf1m9lHZHJZrlAOMMztRRiKimp/rpdJDc9Awry5xTZCte7FHtuS8wJgeYGrex28xNTd086Dik7vUMscQOa8y4DoGtCCSkAKlNwpgNtphjrC6MIHUkR6YWxxs6Sc5xqn222mmCRFzIt8lEdKx+ikCtg91qS2WpwVfBelJCiQJwvzixfI9cxZQWgiSJelKnwBElKYtDOb2MFbhmUigbReQBV0Cg4+qMXSxXSyGUn4UbF8l+7qdSGnTC0XLCmahIgUHLhLOhpVCtw4CzYXvLQWQbJNmxoCsOKAxSgBJno75avolkRw8iIAFcsdc02e9iyCd8tHwmeSSoKTowIgvscSGZUOA7PuCN5b2BX9mQM7S0wYhMNU74zgsPBj3HU7wguAfnxxjFQGBE6pwN+GjME9zHY7zGp8wVxMShYX9NXvEWD3HbwJf4giO4CFIQxXScH1/TM+04kkBiAAAAAElFTkSuQmCC"
 });}});
 </script>
-
 <script>
 window.BASE = {"sp": [{"id": "aguaribay", "n": "Aguaribay", "t": true}, {"id": "espinillo", "n": "Espinillo", "t": true}, {"id": "ceibo", "n": "Ceibo", "t": true}, {"id": "lapacho_rosado", "n": "Lapacho Rosado", "t": true}, {"id": "jacaranda", "n": "Jacarandá", "t": true}, {"id": "tipa", "n": "Tipa Blanca", "t": true}, {"id": "eucalipto", "n": "Eucalipto", "t": true}, {"id": "algarrobo_blanco", "n": "Algarrobo Blanco", "t": true}, {"id": "platano", "n": "Plátano de Sombra", "t": true}, {"id": "tala", "n": "Tala", "t": true}, {"id": "curupi", "n": "Curupí", "t": true}, {"id": "liquidambar", "n": "Liquidámbar", "t": true}, {"id": "palo_borracho", "n": "Palo Borracho Rosado", "t": true}, {"id": "morera", "n": "Morera Negra", "t": true}, {"id": "casuarina", "n": "Casuarina", "t": true}, {"id": "granado", "n": "Granado", "t": true}, {"id": "fresno_americano", "n": "Fresno Americano", "t": false}, {"id": "palmera_pindo", "n": "Palmera Pindó", "t": false}, {"id": "crespon", "n": "Crespón", "t": false}, {"id": "tilo", "n": "Tilo", "t": false}, {"id": "sauce_lloron", "n": "Sauce Llorón", "t": false}, {"id": "magnolia_grandiflora", "n": "Magnolia Grandiflora", "t": false}, {"id": "paraiso", "n": "Paraíso", "t": false}, {"id": "ficus_benjamina", "n": "Ficus Benjamina", "t": false}], "pk": [{"id": "parque_independencia", "n": "Parque de la Independencia"}, {"id": "bv_orono", "n": "Bulevar Nicasio Oroño"}, {"id": "bosque_constituyentes", "n": "Bosque de los Constituyentes"}, {"id": "parque_urquiza", "n": "Parque Urquiza"}, {"id": "parque_bandera", "n": "Parque Nacional a la Bandera"}, {"id": "parque_espana", "n": "Parque de España"}, {"id": "parque_colectividades_sunchales", "n": "Parque de las Colectividades y Sunchales (MACRO)"}, {"id": "parque_scalabrini_ortiz", "n": "Parque Scalabrini Ortiz"}, {"id": "parque_alem", "n": "Parque Leandro N. Alem"}, {"id": "plazas_historicas", "n": "Plazas Históricas (San Martín, 25 de Mayo, Pringles, López)"}]};
 window.PASS_HASH = "a433c1ada8de0ab1ddbc15977d089142a964e18564c41dacf61d8dc1be750f42";
@@ -945,16 +973,24 @@ if(sessionStorage.getItem('fc_ok')==='1') desbloquear();
 
 /* ---------- nav ---------- */
 var navs = document.querySelectorAll('nav button');
+function activarVista(v){
+  navs.forEach(function(x){ x.classList.toggle('on', x.dataset.v===v); });
+  ['nuevo','registros','datos'].forEach(function(v2){
+    $('#vista-'+v2).classList.toggle('activa', v2===v);
+  });
+  if(v==='registros') renderLista();
+}
 navs.forEach(function(b){
   b.addEventListener('click', function(){
-    navs.forEach(function(x){ x.classList.remove('on'); });
-    b.classList.add('on');
-    ['nuevo','registros','datos'].forEach(function(v){
-      $('#vista-'+v).classList.toggle('activa', v===b.dataset.v);
-    });
-    if(b.dataset.v==='registros') renderLista();
+    activarVista(b.dataset.v);
+    try{ history.pushState({v:b.dataset.v}, '', '#'+b.dataset.v); }catch(e){}
   });
 });
+/* botón atrás del dispositivo: retrocede pestaña a pestaña; solo sale estando en Nuevo (el mapa) */
+window.addEventListener('popstate', function(e){
+  activarVista((e.state && e.state.v) || 'nuevo');
+});
+try{ history.replaceState({v:'nuevo'}, '', location.href); }catch(e){}
 
 /* ---------- selects ---------- */
 (function(){
@@ -1287,5 +1323,24 @@ actualizarCuenta();
 initMapa();
 })();
 </script>
-<script>(function(){function c(){var b=a.contentDocument||(a.contentWindow&&a.contentWindow.document);if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'a3af9a0f29f8db70',t:'MTc4OTM5MTExMQ=='};var a=document.createElement('script');a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
+<script>/* Additive accessibility and navigation enhancements. Existing handlers remain intact. */
+(function(){
+'use strict';
+const q=s=>document.querySelector(s);
+q('#zonaFoto').addEventListener('keydown',e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();q('#fotoInput').click();}});
+document.querySelectorAll('.form-guide a').forEach(a=>a.addEventListener('click',e=>{e.preventDefault();q(a.getAttribute('href')).scrollIntoView({behavior:matchMedia('(prefers-reduced-motion: reduce)').matches?'auto':'smooth',block:'start'});}));
+function tabs(){document.querySelectorAll('#nav button').forEach(b=>{if(b.classList.contains('on'))b.setAttribute('aria-current','page');else b.removeAttribute('aria-current');});}
+new MutationObserver(tabs).observe(q('#nav'),{attributes:true,subtree:true,attributeFilter:['class']});tabs();
+function tint(){['tSi','tNo'].forEach(id=>{const e=q('#'+id);e.setAttribute('aria-pressed',String(e.classList.contains('on-si')||e.classList.contains('on-no')));});}
+new MutationObserver(tint).observe(q('.toggle'),{attributes:true,subtree:true,attributeFilter:['class']});tint();
+const normalize=t=>t.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'');
+function filter(){const text=normalize(q('#buscarReg').value.trim()),rows=[...document.querySelectorAll('#listaReg .reg')];let shown=0;rows.forEach(row=>{const show=normalize(row.textContent).includes(text);row.style.display=show?'':'none';if(show)shown++;row.querySelector('[data-del]')?.setAttribute('aria-label','Borrar registro de '+row.querySelector('b').textContent);});q('#resultadoBusqueda').textContent=rows.length?(text?shown+' de '+rows.length+' registros coinciden':rows.length+' registro'+(rows.length===1?'':'s')+' guardado'+(rows.length===1?'':'s')):'';}
+q('#buscarReg').addEventListener('input',filter);new MutationObserver(filter).observe(q('#listaReg'),{childList:true});
+// Clear obsolete warning immediately when clearing the location.
+q('#btnGpsLimpiar').addEventListener('click',()=>q('#avisoFuera').style.display='none');
+// Keep the underlying UI out of the keyboard focus order while locked.
+function lock(){const locked=q('#candado').style.display!=='none';['header','main','#nav'].forEach(sel=>q(sel).inert=locked);if(locked)q('#passInput').focus({preventScroll:true});}
+new MutationObserver(lock).observe(q('#candado'),{attributes:true,attributeFilter:['style']});lock();
+})();
+</script><script>(function(){function c(){var b=a.contentDocument||(a.contentWindow&&a.contentWindow.document);if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'a41d9d30eb9bc18c',t:'MTc5MDU0NDY3Mw=='};var a=document.createElement('script');a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
 </html>
