@@ -56,7 +56,7 @@
   }
   .chip.on{background:var(--verde); border-color:var(--verde); color:#f4efe2;}
   .controles-mapa{
-    position:absolute; right:10px; bottom:24px; z-index:1000; display:flex; flex-direction:column; gap:8px;
+    position:absolute; right:10px; bottom:44px; z-index:1000; display:flex; flex-direction:column; gap:8px;
   }
   .ctrl{
     width:44px; height:44px; border-radius:50%; border:none; background:var(--papel); box-shadow:var(--sombra);
@@ -197,6 +197,9 @@
 .leaflet-control-attribution{max-width:min(58vw,420px);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;font-size:9.5px;line-height:1.25;background:rgba(255,255,255,.85);padding:1px 6px}
 /* botón flotante del panel colapsado: arriba del selector de capas */
 @media (min-width:768px){.flora-fab-panel{bottom:6rem !important}}
+/* zoom (+/-) de Leaflet: al costado de la columna 🧭/📍, sin superponerse */
+.leaflet-bottom.leaflet-right .leaflet-control-zoom{margin:0 64px 44px 0 !important}
+.leaflet-control-zoom{border:none;box-shadow:var(--sombra);border-radius:14px;overflow:hidden}
 </style>
 </head>
 <body>
@@ -1027,6 +1030,6 @@ initMapa();
 cargarComunitarios();
 })();
 </script>
-<script>(function(){function c(){var b=a.contentDocument||(a.contentWindow&&a.contentWindow.document);if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'a41d675bca03ed09',t:'MTc5MDU0MjQ2OA=='};var a=document.createElement('script');a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script><script type="module" src="https://static.cloudflareinsights.com/beacon.min.js/v31edd6df95cf4e85bb4c19e7a9bdbcba1788362987495" integrity="sha512-iIg7k2xntmwu6/uSb5tpc/hySgZc4eoL31yB29W6tJFo2akwjPWcEqnCEdJvGexCL0KEQwVYv5BlowfhVz26hg==" data-cf-beacon='{"version":"2024.11.0","token":"1954b47c125f43f8b4338b3c4f804e4f","spa":2}' crossorigin="anonymous"></script>
+<script type="module" src="https://static.cloudflareinsights.com/beacon.min.js/v31edd6df95cf4e85bb4c19e7a9bdbcba1788362987495" integrity="sha512-iIg7k2xntmwu6/uSb5tpc/hySgZc4eoL31yB29W6tJFo2akwjPWcEqnCEdJvGexCL0KEQwVYv5BlowfhVz26hg==" data-cf-beacon='{"version":"2024.11.0","token":"1954b47c125f43f8b4338b3c4f804e4f","spa":2}' crossorigin="anonymous"></script>
 </body>
 </html>
