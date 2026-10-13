@@ -375,6 +375,87 @@ if(url){
 }
 })();
 </script></script>
-<script type="module" src="https://static.cloudflareinsights.com/beacon.min.js/v31edd6df95cf4e85bb4c19e7a9bdbcba1788362987495" integrity="sha512-iIg7k2xntmwu6/uSb5tpc/hySgZc4eoL31yB29W6tJFo2akwjPWcEqnCEdJvGexCL0KEQwVYv5BlowfhVz26hg==" data-cf-beacon='{"version":"2024.11.0","token":"1954b47c125f43f8b4338b3c4f804e4f","spa":2}' crossorigin="anonymous"></script>
-<script>(function(){function c(){var b=a.contentDocument||(a.contentWindow&&a.contentWindow.document);if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'a41d65f4feb949a5',t:'MTc5MDU0MjQxMQ=='};var a=document.createElement('script');a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
+<script>
+/* ---------- CAPA CENSO MUNICIPAL (r17) ---------- */
+(function(){
+  if(window.__floraCenso) return; window.__floraCenso = true;
+  var CENSO_URL = 'datos/censo-arbolado.json'; /* ← al publicar en GitHub, reemplazar por la URL raw del repositorio */
+  var MAX_MVIL = 8000, MAX_DESK = 15000;
+  var DATA = null, capa = null, renderer = null, on = null, ultimoFiltro = null;
+  on = (function(){ try{ return localStorage.getItem('floraCensoOn') !== '0'; }catch(e){ return true; } })();
+  function mapa(){ return window.mapa || window.__floraMap || null; }
+  function maxPts(){ return (window.matchMedia && matchMedia('(pointer:coarse)').matches) ? MAX_MVIL : MAX_DESK; }
+  function color(sid){ var e = DATA.especies[sid]; return (e && e.t) ? '#c98a2e' : '#5b7d70'; }
+  function popup(sid, p){
+    var e = DATA.especies[sid];
+    var h = '<div style="max-width:235px;font:13px/1.45 system-ui,sans-serif">';
+    h += '<b>' + (e ? e.n : sid) + '</b>' + (e && e.t ? ' \uD83D\uDC9B tint\u00F3rea' : '') + '<br>';
+    if(p[2]) h += '\uD83D\uDCCD ' + p[2] + '<br>';
+    if(p[3]) h += '\uD83D\uDCCF Altura municipal: ' + p[3] + ' m<br>';
+    if(p[4]) h += '\u2B55 Circunferencia: ' + p[4] + ' m<br>';
+    h += '<span style="color:#888">Censo Municipal de Arbolado \u00B7 Rosario</span>';
+    if(window.__verEspecie) h += '<br><button onclick="window.__verEspecie(\''+sid+'\')" style="margin-top:6px;padding:4px 10px;border:0;border-radius:8px;background:#2c5e42;color:#fff;font-weight:600;cursor:pointer">Ver ficha</button>';
+    return h + '</div>';
+  }
+  function dibujar(){
+    if(!capa || !DATA || !on) return;
+    var m = mapa(); if(!m) return;
+    capa.clearLayers();
+    var b = m.getBounds().pad(0.18);
+    var soloTinte = (window.filtroActual === 'tinte') || window.__floraCensoSoloTinte === true;
+    var sel = [], sids = Object.keys(DATA.especies), i, j;
+    for(i=0;i<sids.length;i++){
+      var e = DATA.especies[sids[i]];
+      if(soloTinte && !e.t) continue;
+      var pts = e.pts;
+      for(j=0;j<pts.length;j++){
+        var p = pts[j];
+        if(p[0] > b.getSouth() && p[0] < b.getNorth() && p[1] > b.getWest() && p[1] < b.getEast()) sel.push(sids[i], p);
+      }
+    }
+    var n = sel.length / 2;
+    var stride = Math.max(1, Math.ceil(n / maxPts()));
+    var z = m.getZoom(), r = z >= 15 ? 5 : (z >= 13 ? 3.5 : 2.5);
+    for(i=0;i<sel.length;i+=2*stride){
+      (function(sid, p){
+        L.circleMarker([p[0], p[1]], {renderer: renderer, radius: r, stroke: false, fillColor: color(sid), fillOpacity: .62})
+          .bindPopup(function(){ return popup(sid, p); }, {maxWidth: 270})
+          .addTo(capa);
+      })(sel[i], sel[i+1]);
+    }
+    if(sel.length && window.toast && !capa.__avisado){ capa.__avisado = true; }
+  }
+  function cargar(){
+    fetch(CENSO_URL).then(function(x){ if(!x.ok) throw 0; return x.json(); }).then(function(d){
+      DATA = d;
+      if(window.toast) toast('\u2705 Censo municipal cargado: ' + d.total.toLocaleString('es-AR') + ' \u00E1rboles en el mapa');
+      enganchar();
+    }).catch(function(){ /* sin red: la app sigue funcionando sin la capa */ });
+  }
+  function enganchar(){
+    var m = mapa(); if(!m || !window.L || !DATA) return;
+    if(!renderer){ renderer = L.canvas({padding: .3}); capa = L.layerGroup(); }
+    if(!capa.__montada){
+      capa.__montada = true;
+      capa.on('add', function(){ on = true; try{ localStorage.setItem('floraCensoOn','1'); }catch(e){} dibujar(); });
+      capa.on('remove', function(){ on = false; try{ localStorage.setItem('floraCensoOn','0'); }catch(e){} if(capa) capa.clearLayers(); });
+      m.on('moveend zoomend', dibujar);
+      var lc = null;
+      (m._controls || []).forEach(function(c){ if(c.addOverlay) lc = c; });
+      if(lc){ lc.addOverlay(capa, '\uD83C\uDF33 Censo Municipal (' + DATA.total.toLocaleString('es-AR') + ')'); if(on) capa.addTo(m); }
+      else { if(on) capa.addTo(m); }
+      dibujar();
+      setInterval(function(){ if(window.filtroActual !== ultimoFiltro){ ultimoFiltro = window.filtroActual; dibujar(); } }, 800);
+    } else { dibujar(); }
+  }
+  function esperar(vueltas){
+    if(mapa() && window.L){ enganchar(); cargar(); return; }
+    if(vueltas > 300) return;
+    setTimeout(function(){ esperar(vueltas+1); }, 300);
+  }
+  esperar(0);
+})();
+</script>
+<script type="module" src="https://static.cloudflareinsights.com/beacon.min.js/v4bc70e2c01a94c73b74392e4234840661791215815920" integrity="sha512-L0ha0OXavK/8okipN9F8BtP84dg9DUhPERbBXzwI6dgTA55d2+yweo3pn5CSFYs45/r8md2+xvUPtTdvTNRfjA==" data-cf-beacon='{"version":"2024.11.0","token":"1954b47c125f43f8b4338b3c4f804e4f","spa":2}' crossorigin="anonymous"></script>
+</body>
 </html>
