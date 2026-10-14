@@ -1031,13 +1031,14 @@ cargarComunitarios();
 })();
 </script>
 <script>
-/* ---------- CAPA CENSO MUNICIPAL (r17) ---------- */
+/* ---------- CAPA CENSO MUNICIPAL (r17c) ---------- */
 (function(){
   if(window.__floraCenso) return; window.__floraCenso = true;
-  var CENSO_URL = 'https://raw.githubusercontent.com/walterrodrigogauto/CEITS/refs/heads/main/datos/censo-arbolado.json'; /* ← al publicar en GitHub, reemplazar por la URL raw del repositorio */
+  var CENSO_URL = 'https://raw.githubusercontent.com/walterrodrigogauto/CEITS/refs/heads/main/datos/censo-arbolado.json'; /* al publicar fuera, cambiar por la URL completa (p.ej. raw.githubusercontent.com/usuario/repo/main/datos/censo-arbolado.json) */
   var MAX_MVIL = 8000, MAX_DESK = 15000;
-  var DATA = null, capa = null, renderer = null, on = null, ultimoFiltro = null;
-  on = (function(){ try{ return localStorage.getItem('floraCensoOn') !== '0'; }catch(e){ return true; } })();
+  var DATA = null, capa = null, renderer = null, mapaActual = null, ultimoFiltro = null, modoPill = false;
+  var estado = window.__floraCensoEstado = { fase: 'esperando el mapa', error: null };
+  function on(){ try{ return localStorage.getItem('floraCensoOn') !== '0'; }catch(e){ return true; } }
   function mapa(){ return window.mapa || window.__floraMap || null; }
   function maxPts(){ return (window.matchMedia && matchMedia('(pointer:coarse)').matches) ? MAX_MVIL : MAX_DESK; }
   function color(sid){ var e = DATA.especies[sid]; return (e && e.t) ? '#c98a2e' : '#5b7d70'; }
@@ -1053,10 +1054,10 @@ cargarComunitarios();
     return h + '</div>';
   }
   function dibujar(){
-    if(!capa || !DATA || !on) return;
-    var m = mapa(); if(!m) return;
+    if(!capa || !DATA || !mapaActual) return;
+    if(!mapaActual.hasLayer(capa)) return;
     capa.clearLayers();
-    var b = m.getBounds().pad(0.18);
+    var b = mapaActual.getBounds().pad(0.18);
     var soloTinte = (window.filtroActual === 'tinte') || window.__floraCensoSoloTinte === true;
     var sel = [], sids = Object.keys(DATA.especies), i, j;
     for(i=0;i<sids.length;i++){
@@ -1070,7 +1071,7 @@ cargarComunitarios();
     }
     var n = sel.length / 2;
     var stride = Math.max(1, Math.ceil(n / maxPts()));
-    var z = m.getZoom(), r = z >= 15 ? 5 : (z >= 13 ? 3.5 : 2.5);
+    var z = mapaActual.getZoom(), r = z >= 15 ? 5 : (z >= 13 ? 3.5 : 2.5);
     for(i=0;i<sel.length;i+=2*stride){
       (function(sid, p){
         L.circleMarker([p[0], p[1]], {renderer: renderer, radius: r, stroke: false, fillColor: color(sid), fillOpacity: .62})
@@ -1078,37 +1079,89 @@ cargarComunitarios();
           .addTo(capa);
       })(sel[i], sel[i+1]);
     }
-    if(sel.length && window.toast && !capa.__avisado){ capa.__avisado = true; }
+  }
+  function montarPill(m){
+    var cont = m.getContainer ? m.getContainer() : null;
+    if(!cont || cont.querySelector('.flora-censo-pill')) return;
+    var p = document.createElement('button');
+    p.className = 'flora-censo-pill'; p.type = 'button';
+    p.innerHTML = '\uD83C\uDF33 Censo Municipal <span class="flora-censo-dot">\u25CF</span>';
+    p.style.cssText = 'position:absolute;right:10px;bottom:30px;z-index:1000;display:flex;align-items:center;gap:7px;'
+      + 'background:rgba(20,22,20,.94);color:#fff;border:1px solid rgba(255,255,255,.18);border-radius:999px;'
+      + 'padding:8px 14px;font:600 12px/1 system-ui,sans-serif;cursor:pointer;box-shadow:0 2px 10px rgba(0,0,0,.35)';
+    var dot = p.querySelector('.flora-censo-dot');
+    function pintar(){ var act = capa && m.hasLayer(capa); dot.style.color = act ? '#e8b23a' : '#6b7280'; p.style.opacity = act ? '1' : '.7'; }
+    p.addEventListener('click', function(e){
+      e.stopPropagation();
+      if(m.hasLayer(capa)) m.removeLayer(capa); else capa.addTo(m);
+    });
+    capa.on('add', pintar); capa.on('remove', pintar);
+    if(window.L && L.DomEvent) L.DomEvent.disableClickPropagation(p);
+    cont.appendChild(p);
+    pintar();
+  }
+  function ok(d){
+    DATA = d; estado.fase = 'lista';
+    enganchar();
+    if(window.toast) toast('\u2705 Censo municipal cargado: ' + d.total.toLocaleString('es-AR') + ' \u00E1rboles \u00B7 '
+      + (modoPill ? 'bot\u00F3n \uD83C\uDF33 abajo a la derecha' : 'casilla en el control de capas del mapa'));
+  }
+  function fallar(msg){
+    estado.fase = 'error'; estado.error = msg;
+    console.warn('[FloraCenso]', msg);
+    if(window.toast) toast('\u26A0\uFE0F Capa Censo no disponible: ' + msg);
   }
   function cargar(){
-    fetch(CENSO_URL).then(function(x){ if(!x.ok) throw 0; return x.json(); }).then(function(d){
-      DATA = d;
-      if(window.toast) toast('\u2705 Censo municipal cargado: ' + d.total.toLocaleString('es-AR') + ' \u00E1rboles en el mapa');
-      enganchar();
-    }).catch(function(){ /* sin red: la app sigue funcionando sin la capa */ });
+    estado.fase = 'descargando';
+    fetch(CENSO_URL).then(function(x){ if(!x.ok) throw new Error('HTTP ' + x.status); return x.json(); })
+      .then(ok)
+      .catch(function(){
+        /* file:// y algunos webviews bloquean fetch: probar la variante <script> */
+        var sc = document.createElement('script');
+        sc.src = CENSO_URL.replace(/\.json($|\?)/, '.js$1');
+        sc.onload = function(){ if(window.__CENSO) ok(window.__CENSO); else fallar('censo-arbolado.js sin datos'); };
+        sc.onerror = function(){ fallar('no se encontr\u00F3 la carpeta datos/ junto al index.html'); };
+        document.head.appendChild(sc);
+      });
   }
   function enganchar(){
     var m = mapa(); if(!m || !window.L || !DATA) return;
+    if(m === mapaActual && capa && capa.__montada){ dibujar(); return; }
     if(!renderer){ renderer = L.canvas({padding: .3}); capa = L.layerGroup(); }
+    if(capa.__montada && mapaActual && mapaActual !== m){
+      try{ mapaActual.removeLayer(capa); }catch(e){}
+      capa.__montada = false;
+    }
+    mapaActual = m;
     if(!capa.__montada){
       capa.__montada = true;
-      capa.on('add', function(){ on = true; try{ localStorage.setItem('floraCensoOn','1'); }catch(e){} dibujar(); });
-      capa.on('remove', function(){ on = false; try{ localStorage.setItem('floraCensoOn','0'); }catch(e){} if(capa) capa.clearLayers(); });
+      capa.on('add', function(){ try{ localStorage.setItem('floraCensoOn','1'); }catch(e){} });
+      capa.on('remove', function(){ try{ localStorage.setItem('floraCensoOn','0'); }catch(e){} if(capa) capa.clearLayers(); });
       m.on('moveend zoomend', dibujar);
       var lc = null;
       (m._controls || []).forEach(function(c){ if(c.addOverlay) lc = c; });
-      if(lc){ lc.addOverlay(capa, '\uD83C\uDF33 Censo Municipal (' + DATA.total.toLocaleString('es-AR') + ')'); if(on) capa.addTo(m); }
-      else { if(on) capa.addTo(m); }
-      dibujar();
-      setInterval(function(){ if(window.filtroActual !== ultimoFiltro){ ultimoFiltro = window.filtroActual; dibujar(); } }, 800);
-    } else { dibujar(); }
+      var etiqueta = '\uD83C\uDF33 Censo Municipal (' + DATA.total.toLocaleString('es-AR') + ')';
+      if(lc){ modoPill = false; lc.addOverlay(capa, etiqueta); }
+      else { modoPill = true; montarPill(m); }
+    }
+    if(on() && !m.hasLayer(capa)) capa.addTo(m);
+    dibujar();
   }
-  function esperar(vueltas){
-    if(mapa() && window.L){ enganchar(); cargar(); return; }
-    if(vueltas > 300) return;
-    setTimeout(function(){ esperar(vueltas+1); }, 300);
-  }
-  esperar(0);
+  /* vigilante permanente: engancha cuando el mapa exista y lo sigue si la app lo recrea */
+  setInterval(function(){
+    var m = mapa();
+    if(!m || !window.L || !DATA) return;
+    if(m !== mapaActual || !capa || !capa.__montada){ enganchar(); return; }
+    if(window.filtroActual !== ultimoFiltro){ ultimoFiltro = window.filtroActual; dibujar(); }
+  }, 1200);
+  (function esperar(){
+    var t0 = Date.now();
+    (function tick(){
+      if(mapa() && window.L){ enganchar(); cargar(); return; }
+      if(Date.now() - t0 > 240000){ fallar('el mapa no termin\u00F3 de iniciar (\u00BFFalta internet para Leaflet?)'); return; }
+      setTimeout(tick, 400);
+    })();
+  })();
 })();
 </script>
 <script type="module" src="https://static.cloudflareinsights.com/beacon.min.js/v4bc70e2c01a94c73b74392e4234840661791215815920" integrity="sha512-L0ha0OXavK/8okipN9F8BtP84dg9DUhPERbBXzwI6dgTA55d2+yweo3pn5CSFYs45/r8md2+xvUPtTdvTNRfjA==" data-cf-beacon='{"version":"2024.11.0","token":"1954b47c125f43f8b4338b3c4f804e4f","spa":2}' crossorigin="anonymous"></script>
