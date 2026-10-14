@@ -1034,7 +1034,7 @@ cargarComunitarios();
 /* ---------- CAPA CENSO MUNICIPAL (r17) ---------- */
 (function(){
   if(window.__floraCenso) return; window.__floraCenso = true;
-  var CENSO_URL = 'datos/censo-arbolado.json'; /* ← al publicar en GitHub, reemplazar por la URL raw del repositorio */
+  var CENSO_URL = 'https://raw.githubusercontent.com/walterrodrigogauto/CEITS/refs/heads/main/datos/censo-arbolado.json'; /* ← al publicar en GitHub, reemplazar por la URL raw del repositorio */
   var MAX_MVIL = 8000, MAX_DESK = 15000;
   var DATA = null, capa = null, renderer = null, on = null, ultimoFiltro = null;
   on = (function(){ try{ return localStorage.getItem('floraCensoOn') !== '0'; }catch(e){ return true; } })();
